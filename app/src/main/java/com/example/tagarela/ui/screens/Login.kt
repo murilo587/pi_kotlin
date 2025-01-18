@@ -1,5 +1,7 @@
 package com.example.tagarela.ui.screens
 
+import android.content.Context
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -18,15 +21,23 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tagarela.R
-import androidx.compose.foundation.shape.RoundedCornerShape
 import com.example.tagarela.ui.theme.DarkGray
 import com.example.tagarela.ui.theme.Orange
 import com.example.tagarela.ui.theme.Purple40
+import com.example.tagarela.ui.viewmodel.LoginViewModel
+import com.example.tagarela.data.repository.UserRepository
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun Login() {
+    val context = LocalContext.current
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context))
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val loginResult = loginViewModel.loginResult.value
 
     Column(
         modifier = Modifier
@@ -105,7 +116,7 @@ fun Login() {
                 Spacer(modifier = Modifier.height(70.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = { loginViewModel.login(email, password) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 90.dp)
@@ -118,6 +129,14 @@ fun Login() {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                loginResult?.let { result ->
+                    if (result.success) {
+                        Text("Login bem-sucedido! Usuário ID: ${result.userId}")
+                    } else {
+                        Text("Falha no login: ${result.error}")
+                    }
+                }
+
                 TextButton(
                     onClick = {},
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -129,5 +148,15 @@ fun Login() {
                 }
             }
         }
+    }
+}
+
+class LoginViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
+            val userRepository = UserRepository(context)
+            return LoginViewModel(userRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
