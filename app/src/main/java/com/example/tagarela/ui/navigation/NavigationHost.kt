@@ -6,12 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.tagarela.ui.screens.Login
-import com.example.tagarela.ui.screens.Screen2
+import com.example.tagarela.ui.screens.SearchScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "login", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "search", modifier = modifier) {
         composable("login") { Login() }
-        composable("screen2") { Screen2(navController) }
+        composable("search") { SearchScreen(navController) }
     }
 }
