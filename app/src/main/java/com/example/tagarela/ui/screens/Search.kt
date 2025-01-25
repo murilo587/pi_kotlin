@@ -24,6 +24,7 @@ import com.example.tagarela.data.repository.CardRepository
 import com.example.tagarela.ui.components.CardView
 import com.example.tagarela.ui.components.CustomModal
 import com.example.tagarela.ui.viewmodel.CardViewModel
+import com.example.tagarela.ui.components.Head
 import com.example.tagarela.R
 
 class CardViewModelFactory(private val repository: CardRepository) : ViewModelProvider.Factory {
@@ -53,57 +54,67 @@ fun SearchScreen(navController: NavHostController) {
         filteredCards.value = cards
     }
 
-    if (loading) {
-        CircularProgressIndicator()
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text("Cabeçalho", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Icon(painter = painterResource(id = R.drawable.ic_search), contentDescription = null)
-                BasicTextField(
-                    value = textState.value,
-                    onValueChange = {
-                        textState.value = it
-                        filteredCards.value = if (it.isEmpty()) {
-                            cards
-                        } else {
-                            cards.filter { card ->
-                                card.name.contains(it, ignoreCase = true)
+    Scaffold(
+        topBar = { Head() },
+        content = { innerPadding ->
+            Box(modifier = Modifier.padding(innerPadding)) {
+                if (loading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            BasicTextField(
+                                value = textState.value,
+                                onValueChange = {
+                                    textState.value = it
+                                    filteredCards.value = if (it.isEmpty()) {
+                                        cards
+                                    } else {
+                                        cards.filter { card ->
+                                            card.name.contains(it, ignoreCase = true)
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                                keyboardActions = KeyboardActions(onSearch = {
+                                })
+                            )
+                        }
+
+                        error?.let {
+                            Text(
+                                it,
+                                color = Color.Red,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(filteredCards.value) { card ->
+                                CardView(card = card, onClick = {
+                                    selectedCard.value = card
+                                    modalVisible.value = true
+                                })
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = {
-                    })
-                )
-            }
-            error?.let {
-                Text(it, color = Color.Red, modifier = Modifier.align(Alignment.CenterHorizontally))
-            }
-
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(filteredCards.value) { card ->
-                    CardView(card = card, onClick = {
-                        selectedCard.value = card
-                        modalVisible.value = true
-                    })
+                    }
                 }
             }
         }
-    }
+    )
 
     if (modalVisible.value) {
         selectedCard.value?.let {
