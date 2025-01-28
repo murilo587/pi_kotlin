@@ -1,7 +1,9 @@
 [versions]
+accompanistFlowlayout = "0.24.7-alpha"
 agp = "8.5.1"
 coilCompose = "1.4.0"
 converterGson = "2.9.0"
+foundation = "1.7.6"
 kotlin = "1.9.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -14,6 +16,8 @@ navigationCompose = "2.5.3"
 retrofit = "2.9.0"
 
 [libraries]
+accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
