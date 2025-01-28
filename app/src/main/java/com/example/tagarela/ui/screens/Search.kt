@@ -1,8 +1,6 @@
-package com.example.tagarela.ui.screens
-
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,21 +9,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tagarela.R
 import com.example.tagarela.data.models.Card
+import com.example.tagarela.ui.viewmodel.CardViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tagarela.ui.components.Head
+import com.example.tagarela.ui.components.CustomModal
 import com.example.tagarela.data.repository.CardRepository
 import com.example.tagarela.ui.components.CardView
-import com.example.tagarela.ui.components.CustomModal
-import com.example.tagarela.ui.viewmodel.CardViewModel
-import com.example.tagarela.ui.components.Head
-import com.example.tagarela.R
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.tagarela.ui.theme.PurpleMain
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
 
 class CardViewModelFactory(private val repository: CardRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -50,8 +54,14 @@ fun SearchScreen(navController: NavHostController) {
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    LaunchedEffect(cards) {
-        filteredCards.value = cards
+    LaunchedEffect(cards, textState.value) {
+        filteredCards.value = if (textState.value.isEmpty()) {
+            cards
+        } else {
+            cards.filter { card ->
+                card.name.contains(textState.value, ignoreCase = true)
+            }
+        }
     }
 
     Scaffold(
@@ -66,32 +76,55 @@ fun SearchScreen(navController: NavHostController) {
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp)
                         ) {
-                            BasicTextField(
-                                value = textState.value,
-                                onValueChange = {
-                                    textState.value = it
-                                    filteredCards.value = if (it.isEmpty()) {
-                                        cards
-                                    } else {
-                                        cards.filter { card ->
-                                            card.name.contains(it, ignoreCase = true)
-                                        }
-                                    }
-                                },
+                            Box(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 8.dp),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                                keyboardActions = KeyboardActions(onSearch = {
-                                })
-                            )
+                                    .background(PurpleMain, shape = MaterialTheme.shapes.extraLarge)
+                                    .padding(8.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth().background(PurpleMain)
+                                ) {
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_search),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(25.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    BasicTextField(
+                                        value = textState.value,
+                                        onValueChange = {
+                                            textState.value = it
+                                        },
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .background(PurpleMain)
+                                            .padding(horizontal = 8.dp, vertical = 12.dp),
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                                        keyboardActions = KeyboardActions(onSearch = {
+                                        }),
+                                        textStyle = TextStyle(color = Color.White, fontSize = 20.sp),
+                                        cursorBrush = SolidColor(Color.Black),
+                                        decorationBox = { innerTextField ->
+                                            if (textState.value.isEmpty()) {
+                                                Text(
+                                                    text = "Search",
+                                                    style = TextStyle(color = Color.White, fontSize = 20.sp)
+                                                )
+                                            }
+                                            innerTextField()
+                                        }
+                                    )
+                                }
+                            }
                         }
 
                         error?.let {
@@ -101,13 +134,30 @@ fun SearchScreen(navController: NavHostController) {
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
                         }
-
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            items(filteredCards.value) { card ->
-                                CardView(card = card, onClick = {
-                                    selectedCard.value = card
-                                    modalVisible.value = true
-                                })
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(top = 8.dp)
+                        ) {
+                            item {
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    mainAxisSpacing = 8.dp,
+                                    crossAxisSpacing = 8.dp,
+                                    crossAxisAlignment = FlowCrossAxisAlignment.Start,
+                                    mainAxisAlignment = FlowMainAxisAlignment.Center, // Center the cards horizontally
+                                ) {
+                                    filteredCards.value.forEach { card ->
+                                        CardView(
+                                            card = card,
+                                            onClick = {
+                                                selectedCard.value = card
+                                                modalVisible.value = true
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

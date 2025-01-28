@@ -17,7 +17,8 @@ import com.example.tagarela.data.models.Card
 fun CardView(card: Card, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(115.dp)
+            .height(130.dp)
             .padding(bottom = 16.dp)
             .clickable { onClick() },
     ) {
