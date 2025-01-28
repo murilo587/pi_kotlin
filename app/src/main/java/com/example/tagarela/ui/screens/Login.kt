@@ -25,19 +25,24 @@ import com.example.tagarela.ui.theme.DarkGray
 import com.example.tagarela.ui.theme.Orange
 import com.example.tagarela.ui.theme.Purple40
 import com.example.tagarela.ui.viewmodel.LoginViewModel
+import com.example.tagarela.data.UserPreferences
 import com.example.tagarela.data.repository.UserRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 
 @Composable
-fun Login() {
+fun Login(navHostController: NavHostController) {
     val context = LocalContext.current
     val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context))
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginResult = loginViewModel.loginResult.value
+
+    val userPreferences = UserPreferences(context)
+    val userId by userPreferences.userId.collectAsState(initial = null)
 
     Column(
         modifier = Modifier
@@ -131,11 +136,20 @@ fun Login() {
 
                 loginResult?.let { result ->
                     if (result.success) {
-                        Text("Login bem-sucedido! Usuário ID: ${result.userId}")
+                        Text("Login bem-sucedido!")
+                        LaunchedEffect(userId) {
+                            if (userId != null) {
+                                navHostController.navigate("search")
+                            }
+                        }
+                        if (userId == null) {
+                            Text("ID de usuário não encontrado. Por favor, tente novamente.")
+                        }
                     } else {
                         Text("Falha no login: ${result.error}")
                     }
                 }
+
 
                 TextButton(
                     onClick = {},
@@ -155,7 +169,8 @@ class LoginViewModelFactory(private val context: Context) : ViewModelProvider.Fa
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
             val userRepository = UserRepository(context)
-            return LoginViewModel(userRepository) as T
+            val userPreferences = UserPreferences(context)
+            return LoginViewModel(userRepository, userPreferences) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

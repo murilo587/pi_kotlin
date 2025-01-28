@@ -2,8 +2,7 @@ package com.example.tagarela.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.tagarela.data.api.LoginRequest
-import com.example.tagarela.data.api.LoginResponse
+import com.example.tagarela.data.models.LoginRequest
 import com.example.tagarela.data.api.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

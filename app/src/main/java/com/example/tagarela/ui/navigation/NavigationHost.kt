@@ -10,8 +10,8 @@ import com.example.tagarela.ui.screens.Login
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "search", modifier = modifier) {
-        composable("login") { Login() }
+    NavHost(navController = navController, startDestination = "login", modifier = modifier) {
+        composable("login") { Login(navController) }
         composable("search") { SearchScreen(navController) }
     }
 }
