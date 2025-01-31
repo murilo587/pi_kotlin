@@ -26,10 +26,10 @@ fun SettingsScreen(navHostController: NavHostController) {
             Box(modifier = Modifier.padding(innerPadding)) {
                 Column(modifier = Modifier.padding(40.dp)) {
                     Column {
-                        Spacer(modifier = Modifier.height(55.dp))
+                        Spacer(modifier = Modifier.height(30.dp))
                         Text(
                             text = "CONFIGURAÇÕES",
-                            style = TextStyle(color = Color.Black, fontSize = 20.sp)
+                            style = TextStyle(color = Color.Black, fontSize = 25.sp)
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(top = 20.dp),
@@ -37,9 +37,9 @@ fun SettingsScreen(navHostController: NavHostController) {
                             color = Color.Gray
                         )
                     }
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Column(modifier = Modifier.padding(top = 30.dp)) {
                         Row(
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(vertical = 20.dp)
                                 . clickable {},
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -53,7 +53,7 @@ fun SettingsScreen(navHostController: NavHostController) {
                                         .height(30.dp)
                                         .width(30.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "SUA CONTA",
                                     style = TextStyle(color = Color.Black, fontSize = 20.sp),
@@ -67,11 +67,11 @@ fun SettingsScreen(navHostController: NavHostController) {
                                 contentDescription = null,
                                 modifier = Modifier
                                     .height(25.dp)
-                                    .width(25.dp)
+                                    .width(15.dp)
                             )
                         }
                         Row(
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(vertical = 20.dp)
                                 . clickable {},
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -84,7 +84,7 @@ fun SettingsScreen(navHostController: NavHostController) {
                                         .height(30.dp)
                                         .width(30.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "PROGRESSO",
                                     style = TextStyle(color = Color.Black, fontSize = 20.sp),
@@ -98,11 +98,11 @@ fun SettingsScreen(navHostController: NavHostController) {
                                 contentDescription = null,
                                 modifier = Modifier
                                     .height(25.dp)
-                                    .width(25.dp)
+                                    .width(15.dp)
                             )
                         }
                         Row(
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(vertical = 20.dp)
                                 . clickable {},
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -115,7 +115,7 @@ fun SettingsScreen(navHostController: NavHostController) {
                                         .height(30.dp)
                                         .width(30.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = "NOTIFICAÇÃO",
                                     style = TextStyle(color = Color.Black, fontSize = 20.sp),
@@ -129,7 +129,7 @@ fun SettingsScreen(navHostController: NavHostController) {
                                 contentDescription = null,
                                 modifier = Modifier
                                     .height(25.dp)
-                                    .width(25.dp)
+                                    .width(15.dp)
                             )
                         }
                     }
