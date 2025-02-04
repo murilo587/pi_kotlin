@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tagarela.R
 import com.example.tagarela.ui.components.Head
+import com.example.tagarela.ui.components.Menu
 
 @Composable
 fun SettingsScreen(navHostController: NavHostController) {
@@ -39,8 +40,9 @@ fun SettingsScreen(navHostController: NavHostController) {
                     }
                     Column(modifier = Modifier.padding(top = 30.dp)) {
                         Row(
-                            modifier = Modifier.padding(vertical = 20.dp)
-                                . clickable {},
+                            modifier = Modifier
+                                .padding(vertical = 20.dp)
+                                .clickable {},
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
 
@@ -71,8 +73,9 @@ fun SettingsScreen(navHostController: NavHostController) {
                             )
                         }
                         Row(
-                            modifier = Modifier.padding(vertical = 20.dp)
-                                . clickable {},
+                            modifier = Modifier
+                                .padding(vertical = 20.dp)
+                                .clickable {},
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -102,8 +105,9 @@ fun SettingsScreen(navHostController: NavHostController) {
                             )
                         }
                         Row(
-                            modifier = Modifier.padding(vertical = 20.dp)
-                                . clickable {},
+                            modifier = Modifier
+                                .padding(vertical = 20.dp)
+                                .clickable {},
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -135,6 +139,7 @@ fun SettingsScreen(navHostController: NavHostController) {
                     }
                 }
             }
-        }
+        },
+        bottomBar = { Menu() }
     )
 }

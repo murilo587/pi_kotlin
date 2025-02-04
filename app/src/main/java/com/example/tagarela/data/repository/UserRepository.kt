@@ -15,7 +15,7 @@ class UserRepository(private val context: Context) {
         return withContext(Dispatchers.IO) {
             val editor = sharedPreferences.edit()
             try {
-                val response = RetrofitClient.apiService.login(SignInRequest(email, password))
+                val response = RetrofitClient.apiService.signIn(SignInRequest(email, password))
                 editor.putString("user_id", response.userId)
                 editor.apply()
                 Result(success = true, message = response.message, userId = response.userId)

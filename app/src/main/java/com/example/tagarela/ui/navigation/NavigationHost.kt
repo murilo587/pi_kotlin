@@ -12,7 +12,7 @@ import com.example.tagarela.ui.screens.SignUpScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "signin", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "settings", modifier = modifier) {
         composable("signin") { SignInScreen(navController) }
         composable("search") { SearchScreen(navController) }
         composable("settings") { SettingsScreen(navController)}
