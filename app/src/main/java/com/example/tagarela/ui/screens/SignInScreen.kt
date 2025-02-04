@@ -24,7 +24,7 @@ import com.example.tagarela.R
 import com.example.tagarela.ui.theme.DarkGray
 import com.example.tagarela.ui.theme.Orange
 import com.example.tagarela.ui.theme.Purple40
-import com.example.tagarela.ui.viewmodel.LoginViewModel
+import com.example.tagarela.ui.viewmodel.SignInViewModel
 import com.example.tagarela.data.UserPreferences
 import com.example.tagarela.data.repository.UserRepository
 import androidx.lifecycle.ViewModel
@@ -33,9 +33,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 
 @Composable
-fun LoginScreen(navHostController: NavHostController) {
+fun SignInScreen(navHostController: NavHostController) {
     val context = LocalContext.current
-    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context))
+    val loginViewModel: SignInViewModel = viewModel(factory = LoginViewModelFactory(context))
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -167,10 +167,10 @@ fun LoginScreen(navHostController: NavHostController) {
 
 class LoginViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(SignInViewModel::class.java)) {
             val userRepository = UserRepository(context)
             val userPreferences = UserPreferences(context)
-            return LoginViewModel(userRepository, userPreferences) as T
+            return SignInViewModel(userRepository, userPreferences) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

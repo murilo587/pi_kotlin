@@ -2,7 +2,7 @@ package com.example.tagarela.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.tagarela.data.models.LoginRequest
+import com.example.tagarela.data.models.SignInRequest
 import com.example.tagarela.data.models.SignUpRequest
 import com.example.tagarela.data.api.RetrofitClient
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +15,7 @@ class UserRepository(private val context: Context) {
         return withContext(Dispatchers.IO) {
             val editor = sharedPreferences.edit()
             try {
-                val response = RetrofitClient.apiService.login(LoginRequest(email, password))
+                val response = RetrofitClient.apiService.login(SignInRequest(email, password))
                 editor.putString("user_id", response.userId)
                 editor.apply()
                 Result(success = true, message = response.message, userId = response.userId)

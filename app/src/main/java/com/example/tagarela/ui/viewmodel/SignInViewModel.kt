@@ -8,7 +8,7 @@ import com.example.tagarela.data.repository.UserRepository
 import com.example.tagarela.data.UserPreferences
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val repository: UserRepository, private val userPreferences: UserPreferences) : ViewModel() {
+class SignInViewModel(private val repository: UserRepository, private val userPreferences: UserPreferences) : ViewModel() {
     var loginResult = mutableStateOf<Result?>(null)
         private set
 
