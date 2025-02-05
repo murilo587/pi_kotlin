@@ -60,7 +60,7 @@ fun SignUpScreen(navHostController: NavHostController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(90.dp))
+            Spacer(modifier = Modifier.height(50.dp))
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
@@ -69,13 +69,13 @@ fun SignUpScreen(navHostController: NavHostController) {
                     .height(100.dp)
             )
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(Color.White, shape = RoundedCornerShape(topStart = 76.dp))
+                    .background(Color.White, shape = RoundedCornerShape(topStart = 45.dp, topEnd = 45.dp))
                     .padding(20.dp)
             ) {
                 val annotatedString = AnnotatedString.Builder().apply {
@@ -99,7 +99,7 @@ fun SignUpScreen(navHostController: NavHostController) {
                     label = { Text("APELIDO", fontSize = 18.sp) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(70.dp)
+                        .height(60.dp)
                         .padding(horizontal = 13.dp),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
@@ -113,7 +113,7 @@ fun SignUpScreen(navHostController: NavHostController) {
                     label = { Text("EMAIL", fontSize = 18.sp) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(70.dp)
+                        .height(60.dp)
                         .padding(horizontal = 13.dp),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
@@ -127,7 +127,7 @@ fun SignUpScreen(navHostController: NavHostController) {
                     label = { Text("SENHA", fontSize = 18.sp) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(70.dp)
+                        .height(60.dp)
                         .padding(horizontal = 13.dp),
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
@@ -142,14 +142,14 @@ fun SignUpScreen(navHostController: NavHostController) {
                     label = { Text("REPITA A SENHA", fontSize = 18.sp) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(70.dp)
+                        .height(60.dp)
                         .padding(horizontal = 13.dp),
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
                 )
 
-                Spacer(modifier = Modifier.height(70.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = { signUpViewModel.signUp(nickname, email, password, repeatPassword) },
@@ -160,10 +160,10 @@ fun SignUpScreen(navHostController: NavHostController) {
                     colors = ButtonDefaults.buttonColors(containerColor = Orange),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("CADASTRAR", fontSize = 22.sp, color = Color.White)
+                    Text("CADASTRAR", fontSize = 20.sp, color = Color.White)
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(5.dp))
 
                 signUpResult?.let { result ->
                     if (result.success) {
@@ -182,7 +182,7 @@ fun SignUpScreen(navHostController: NavHostController) {
                 }
 
                 TextButton(
-                    onClick = { navHostController.navigate("login") },
+                    onClick = { navHostController.navigate("signin") },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
