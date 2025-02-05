@@ -10,7 +10,7 @@ import com.example.tagarela.data.models.SignUpRequest
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(private val repository: UserRepository, private val userPreferences: UserPreferences) : ViewModel() {
-    var signUpResult = mutableStateOf<Result?>(null)
+    var signUpResult = mutableStateOf<Result<Any?>?>(null)
         private set
 
     fun signUp(username: String, email: String, password: String, repeatPassword: String) {

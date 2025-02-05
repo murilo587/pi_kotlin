@@ -2,18 +2,17 @@ package com.example.tagarela.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.tagarela.data.models.SignInRequest
-import com.example.tagarela.data.models.SignUpRequest
-import com.example.tagarela.data.models.User
-import com.example.tagarela.data.models.UserResponse
+import android.util.Log
+import com.example.tagarela.data.models.*
 import com.example.tagarela.data.api.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 class UserRepository(private val context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
-    suspend fun login(email: String, password: String): Result {
+    suspend fun login(email: String, password: String): Result<Any?> {
         return withContext(Dispatchers.IO) {
             val editor = sharedPreferences.edit()
             try {
@@ -28,7 +27,7 @@ class UserRepository(private val context: Context) {
         }
     }
 
-    suspend fun registerUser(request: SignUpRequest): Result {
+    suspend fun registerUser(request: SignUpRequest): Result<Any?> {
         return withContext(Dispatchers.IO) {
             val editor = sharedPreferences.edit()
             try {
@@ -60,7 +59,24 @@ class UserRepository(private val context: Context) {
             }
         }
     }
+
+    suspend fun updateUser(userId: String, username: String, email: String, password: String): Result<Any?> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val user = User(email = email, username = username, password = password)
+                val response: Response<UserResponse> = RetrofitClient.apiService.updateUser(userId, user)
+                if (response.isSuccessful) {
+                    Result(success = true, message = "User updated successfully")
+                } else {
+                    Result(success = false, error = "Error updating user data")
+                }
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: "Error updating user data"
+                Result(success = false, error = errorMessage)
+            }
+        }
+    }
 }
 
-data class Result(val success: Boolean, val message: String? = null, val userId: String? = null, val error: String? = null)
+data class Result<T>(val success: Boolean, val message: String? = null, val userId: String? = null, val error: String? = null)
 data class UserResult(val success: Boolean, val user: User? = null, val error: String? = null)

@@ -1,5 +1,6 @@
 package com.example.tagarela.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,30 +11,40 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.compose.ui.platform.LocalContext
 import com.example.tagarela.R
 import com.example.tagarela.ui.components.Head
 import com.example.tagarela.ui.components.Menu
-import com.example.tagarela.data.models.User
-import com.example.tagarela.data.repository.UserRepository
+import com.example.tagarela.ui.viewmodel.AccountViewModel
+import android.util.Log
+
+class AccountViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AccountViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AccountViewModel(context) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 
 @Composable
 fun MyAccountScreen(navHostController: NavHostController, userId: String) {
     val context = LocalContext.current
-    var user by remember { mutableStateOf<User?>(null) }
+    val viewModel: AccountViewModel = viewModel(factory = AccountViewModelFactory(context))
+    val user by viewModel.user.collectAsState()
 
     LaunchedEffect(Unit) {
-        val repository = UserRepository(context)
-        val userResult = repository.getUserData(userId)
-        if (userResult.success) {
-            user = userResult.user
-        } else {
-        }
+        Log.d("MyAccountScreen", "Launching effect to get user data")
+        viewModel.getUserData(userId)
     }
 
     Scaffold(
@@ -60,10 +71,18 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
                             verticalAlignment = Alignment.Top
                         ) {
                             Column {
-                                user?.let {
-                                    UserInfoItem(label = "Nome", info = it.username)
-                                    UserInfoItem(label = "E-mail", info = it.email)
+                                if (user != null) {
+                                    Log.d("MyAccountScreen", "User data: ${user?.username}, ${user?.email}")
+                                    UserInfoItem(label = "Nome", info = user!!.username)
+                                    UserInfoItem(label = "E-mail", info = user!!.email)
                                     UserInfoItem(label = "Senha", info = "**********")
+                                } else {
+                                    Log.d("MyAccountScreen", "User data is null")
+                                    Text(
+                                        text = "Carregando...",
+                                        style = TextStyle(color = Color.DarkGray, fontSize = 20.sp),
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
                                 }
                             }
                             Image(
@@ -72,7 +91,7 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clickable {
-                                        navHostController.navigate("")
+                                        navHostController.navigate("editaccount/$userId")
                                     }
                             )
                         }

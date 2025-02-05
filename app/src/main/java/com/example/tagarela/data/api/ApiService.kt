@@ -6,11 +6,14 @@ import com.example.tagarela.data.models.SignInRequest
 import com.example.tagarela.data.models.SignInResponse
 import com.example.tagarela.data.models.SignUpRequest
 import com.example.tagarela.data.models.SignUpResponse
+import com.example.tagarela.data.models.User
 import com.example.tagarela.data.models.UserResponse
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -22,4 +25,6 @@ interface ApiService {
     suspend fun getAllItems(): CardResponse
     @GET("user/{id}")
     fun getUser(@Path("id") userId: String): Call<UserResponse>
+    @PUT("user/{id}")
+    suspend fun updateUser(@Path("id") id: String, @Body user: User): Response<UserResponse>
 }

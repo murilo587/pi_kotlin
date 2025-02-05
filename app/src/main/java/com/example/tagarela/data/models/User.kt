@@ -7,6 +7,6 @@ data class UserResponse(
 
 data class User(
     val email: String,
-    val my_items: List<String>,
-    val username: String
+    val username: String,
+    val password: String
 )

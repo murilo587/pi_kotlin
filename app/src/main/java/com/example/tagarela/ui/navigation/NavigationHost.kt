@@ -10,6 +10,7 @@ import com.example.tagarela.ui.screens.SignInScreen
 import com.example.tagarela.ui.screens.SettingsScreen
 import com.example.tagarela.ui.screens.SignUpScreen
 import com.example.tagarela.ui.screens.MyAccountScreen
+import com.example.tagarela.ui.screens.EditAccountScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -21,6 +22,10 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
         composable("myaccount/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             userId?.let { MyAccountScreen(navController, it) }
+        }
+        composable("editaccount/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            userId?.let { EditAccountScreen(navController, it) }
         }
     }
 }
