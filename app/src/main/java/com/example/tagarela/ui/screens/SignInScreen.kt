@@ -85,8 +85,8 @@ fun SignInScreen(navHostController: NavHostController) {
 
                 Text(
                     text = annotatedString,
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(26.dp)
+                    modifier = Modifier.padding(25.dp),
+                    fontSize = 28.sp
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -129,7 +129,7 @@ fun SignInScreen(navHostController: NavHostController) {
                     colors = ButtonDefaults.buttonColors(containerColor = Purple40),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("ENTRAR", fontSize = 22.sp, color = Color.White)
+                    Text("ENTRAR", fontSize = 20.sp, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -152,7 +152,7 @@ fun SignInScreen(navHostController: NavHostController) {
 
 
                 TextButton(
-                    onClick = {},
+                    onClick = {navHostController.navigate("signup")},
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
