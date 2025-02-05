@@ -10,11 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.tagarela.R
 import com.example.tagarela.ui.theme.Purple40
 
 @Composable
-fun Menu() {
+fun Menu(navHostController: NavHostController) {
     Box(
         modifier = Modifier
             .background(Purple40)
@@ -72,7 +73,7 @@ fun Menu() {
                 )
             }
             Button(
-                onClick = {},
+                onClick = {navHostController.navigate("settings")},
                 modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Transparent

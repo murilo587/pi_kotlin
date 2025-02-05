@@ -80,7 +80,7 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
                 }
             }
         },
-        bottomBar = { Menu() }
+        bottomBar = { Menu(navHostController) }
     )
 }
 

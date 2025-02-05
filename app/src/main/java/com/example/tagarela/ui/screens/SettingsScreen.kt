@@ -153,6 +153,6 @@ fun SettingsScreen(navHostController: NavHostController) {
                 }
             }
         },
-        bottomBar = { Menu() }
+        bottomBar = { Menu(navHostController) }
     )
 }
