@@ -9,13 +9,19 @@ import androidx.navigation.compose.composable
 import com.example.tagarela.ui.screens.SignInScreen
 import com.example.tagarela.ui.screens.SettingsScreen
 import com.example.tagarela.ui.screens.SignUpScreen
+import com.example.tagarela.ui.screens.MyAccountScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "settings", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "signin", modifier = modifier) {
         composable("signin") { SignInScreen(navController) }
         composable("search") { SearchScreen(navController) }
         composable("settings") { SettingsScreen(navController)}
         composable("signup") { SignUpScreen(navController)}
+        composable("myaccount/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            userId?.let { MyAccountScreen(navController, it) }
+        }
     }
 }
+

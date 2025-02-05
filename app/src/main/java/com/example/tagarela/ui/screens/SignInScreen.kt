@@ -139,7 +139,7 @@ fun SignInScreen(navHostController: NavHostController) {
                         Text("Login bem-sucedido!")
                         LaunchedEffect(userId) {
                             if (userId != null) {
-                                navHostController.navigate("search")
+                                navHostController.navigate("myaccount/${result.userId}")
                             }
                         }
                         if (userId == null) {
