@@ -37,7 +37,7 @@ fun SignInScreen(navHostController: NavHostController) {
     val context = LocalContext.current
     val loginViewModel: SignInViewModel = viewModel(factory = LoginViewModelFactory(context))
 
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginResult = loginViewModel.loginResult.value
 
@@ -92,8 +92,8 @@ fun SignInScreen(navHostController: NavHostController) {
                 Spacer(modifier = Modifier.height(20.dp))
 
                 TextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = username,
+                    onValueChange = { username = it },
                     label = { Text("EMAIL", fontSize = 18.sp) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,7 +121,7 @@ fun SignInScreen(navHostController: NavHostController) {
                 Spacer(modifier = Modifier.height(70.dp))
 
                 Button(
-                    onClick = { loginViewModel.login(email, password) },
+                    onClick = { loginViewModel.login(username, password) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 90.dp)
@@ -146,7 +146,7 @@ fun SignInScreen(navHostController: NavHostController) {
                             Text("ID de usuário não encontrado. Por favor, tente novamente.")
                         }
                     } else {
-                        Text("Falha no login: ${result.error}")
+                        Text("Falha no login: ${result}")
                     }
                 }
 

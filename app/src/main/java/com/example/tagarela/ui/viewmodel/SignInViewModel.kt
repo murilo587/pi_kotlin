@@ -13,9 +13,9 @@ class SignInViewModel(private val repository: UserRepository, private val userPr
     var loginResult = mutableStateOf<Result<Any?>?>(null)
         private set
 
-    fun login(email: String, password: String) {
+    fun login(username: String, password: String) {
         viewModelScope.launch {
-            val result = repository.login(email, password)
+            val result = repository.login(username, password)
             loginResult.value = result
             if (result.success) {
                 result.userId?.let { userPreferences.saveUserId(it) }

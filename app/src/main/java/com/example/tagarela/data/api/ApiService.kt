@@ -17,7 +17,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
-    @POST("logar")
+    @POST("user/login")
     suspend fun signIn(@Body request: SignInRequest): SignInResponse
     @POST("register")
     suspend fun signUp(@Body request: SignUpRequest): SignUpResponse

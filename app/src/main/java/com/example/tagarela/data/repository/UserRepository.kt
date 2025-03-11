@@ -12,14 +12,13 @@ import retrofit2.Response
 class UserRepository(private val context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
-    suspend fun login(email: String, password: String): Result<Any?> {
+    suspend fun login(username: String, password: String): Result<Any?> {
         return withContext(Dispatchers.IO) {
             val editor = sharedPreferences.edit()
             try {
-                val response = RetrofitClient.apiService.signIn(SignInRequest(email, password))
-                editor.putString("user_id", response.userId)
+                val response = RetrofitClient.apiService.signIn(SignInRequest(username, password))
                 editor.apply()
-                Result(success = true, message = response.message, userId = response.userId)
+                Result(success = true, message = "Login successful", userId = response.accessToken)
             } catch (e: Exception) {
                 val errorMessage = e.message ?: "Login Error"
                 Result(success = false, error = errorMessage)
