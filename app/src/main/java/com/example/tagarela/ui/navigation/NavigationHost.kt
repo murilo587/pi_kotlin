@@ -14,7 +14,7 @@ import com.example.tagarela.ui.screens.EditAccountScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "signin", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "search", modifier = modifier) {
         composable("signin") { SignInScreen(navController) }
         composable("search") { SearchScreen(navController) }
         composable("settings") { SettingsScreen(navController)}

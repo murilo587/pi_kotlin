@@ -1,7 +1,6 @@
 package com.example.tagarela.data.api
 
 import com.example.tagarela.data.models.Card
-import com.example.tagarela.data.models.CardResponse
 import com.example.tagarela.data.models.SignInRequest
 import com.example.tagarela.data.models.SignInResponse
 import com.example.tagarela.data.models.SignUpRequest
@@ -21,8 +20,8 @@ interface ApiService {
     suspend fun signIn(@Body request: SignInRequest): SignInResponse
     @POST("register")
     suspend fun signUp(@Body request: SignUpRequest): SignUpResponse
-    @GET("items")
-    suspend fun getAllItems(): CardResponse
+    @GET("item")
+    suspend fun getAllItems(): List<Card>
     @GET("user/{id}")
     fun getUser(@Path("id") userId: String): Call<UserResponse>
     @PUT("user/{id}")

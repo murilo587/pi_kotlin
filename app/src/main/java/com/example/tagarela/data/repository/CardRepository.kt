@@ -5,7 +5,6 @@ import com.example.tagarela.data.models.Card
 
 class CardRepository {
     suspend fun getAllCards(): List<Card> {
-        val response = RetrofitClient.apiService.getAllItems()
-        return response.items
+        return RetrofitClient.apiService.getAllItems()
     }
 }
