@@ -1,8 +1,9 @@
 package com.example.tagarela.ui.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
+import android.content.Context
+import android.media.AudioManager
+import android.net.Uri
+import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,11 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.ui.theme.Orange
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.unit.IntOffset
+import com.example.tagarela.BuildConfig
 import kotlinx.coroutines.launch
 
 @Composable
@@ -28,6 +34,7 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
     val syllables = card.syllables.split("-")
     val offsetY = remember { Animatable(1600f) }
     val coroutineScope = rememberCoroutineScope()
+    val videoUrl = "${BuildConfig.BASE_IMG_URL}${card.video}"
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -72,6 +79,27 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                         fontWeight = FontWeight.Bold
                     ),
                     modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                AndroidView(
+                    factory = { context ->
+                        VideoView(context).apply {
+                            val videoUri = Uri.parse(videoUrl)
+                            setVideoURI(videoUri)
+
+                            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                            audioManager.setStreamVolume(
+                                AudioManager.STREAM_MUSIC,
+                                audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                0
+                            )
+
+                            start()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
                 )
 
                 Text(
