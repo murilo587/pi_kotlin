@@ -1,7 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
+
+val localProperties = rootProject.file("local.properties")
+val properties = Properties()
+
+if (localProperties.exists()) {
+    properties.load(localProperties.inputStream())
+}
+
+val baseImgUrl = properties.getProperty("baseImgUrl") ?: "default_url"
 
 android {
     namespace = "com.example.tagarela"
@@ -13,6 +24,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "BASE_IMG_URL", "\"$baseImgUrl\"")
+
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -38,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

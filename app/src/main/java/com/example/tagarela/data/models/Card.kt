@@ -4,7 +4,7 @@ data class Card(
     val audio: String,
     val category: String,
     val id: String,
-    val img: String,
+    val image: String,
     val name: String,
     val subcategory: String,
     val syllables: String,
