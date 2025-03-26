@@ -1,10 +1,13 @@
 package com.example.tagarela.ui.components
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -13,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.IntOffset
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.ui.theme.Orange
 import kotlinx.coroutines.launch
@@ -25,7 +28,6 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
     val syllables = card.syllables.split("-")
     val offsetY = remember { Animatable(1600f) }
     val coroutineScope = rememberCoroutineScope()
-
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -42,7 +44,11 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0x80000000)),
+            .background(Color(0x80000000))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {},
         contentAlignment = Alignment.BottomCenter
     ) {
         Box(
@@ -50,13 +56,12 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f)
                 .offset { IntOffset(0, offsetY.value.toInt()) }
-                .background(Color.White)
+                .background(Color.White, shape = RoundedCornerShape(16.dp))
                 .padding(16.dp),
             contentAlignment = Alignment.TopCenter
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
