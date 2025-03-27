@@ -2,39 +2,48 @@ package com.example.tagarela.ui.components
 
 import android.content.Context
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.widget.VideoView
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.tagarela.data.models.Card
-import com.example.tagarela.ui.theme.Orange
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.unit.IntOffset
 import com.example.tagarela.BuildConfig
+import com.example.tagarela.R
+import com.example.tagarela.data.models.Card
+import com.example.tagarela.ui.theme.DarkGray
+import com.example.tagarela.ui.theme.Orange
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun CustomModal(card: Card, onClose: () -> Unit) {
     val syllables = card.syllables.split("-")
     val offsetY = remember { Animatable(1600f) }
     val coroutineScope = rememberCoroutineScope()
-    val videoUrl = "${BuildConfig.BASE_IMG_URL}${card.video}"
+    val baseUrl = BuildConfig.BASE_IMG_URL
+    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -63,7 +72,7 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f)
                 .offset { IntOffset(0, offsetY.value.toInt()) }
-                .background(Color.White, shape = RoundedCornerShape(16.dp))
+                .background(Color.White, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .padding(16.dp),
             contentAlignment = Alignment.TopCenter
         ) {
@@ -72,10 +81,10 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = card.name,
+                    text = card.name.uppercase(),
                     style = TextStyle(
-                        color = Color.Blue,
-                        fontSize = 20.sp,
+                        color = DarkGray,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold
                     ),
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -84,10 +93,11 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                 AndroidView(
                     factory = { context ->
                         VideoView(context).apply {
-                            val videoUri = Uri.parse(videoUrl)
+                            val videoUri = Uri.parse(baseUrl + card.video)
                             setVideoURI(videoUri)
 
-                            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                            val audioManager =
+                                context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                             audioManager.setStreamVolume(
                                 AudioManager.STREAM_MUSIC,
                                 audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
@@ -102,33 +112,47 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                         .height(200.dp)
                 )
 
-                Text(
-                    text = "Detalhes do cartão",
-                    style = TextStyle(
-                        color = Color.Gray,
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(30.dp),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        16.dp,
+                        Alignment.CenterHorizontally
+                    )
                 ) {
                     syllables.forEach { syllable ->
                         Box(
                             modifier = Modifier
-                                .padding(4.dp)
                                 .background(Orange, shape = RoundedCornerShape(4.dp))
-                                .padding(8.dp),
+                                .padding(14.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = syllable)
+                            Text(
+                                text = syllable.uppercase(),
+                                color = Color.White,
+                                fontWeight = FontWeight(weight = 600),
+                                fontSize = 22.sp
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
+                Image(
+                    painter = painterResource(R.drawable.ic_play),
+                    contentDescription = "Play icon",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clickable {
+                            val audioUri = Uri.parse(baseUrl + card.audio)
+                            MediaPlayer.create(context, audioUri)?.apply {
+                                setOnCompletionListener { release() }
+                                start()
+                            }
+                        }
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
                     onClick = {
@@ -143,9 +167,19 @@ fun CustomModal(card: Card, onClose: () -> Unit) {
                             onClose()
                         }
                     },
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(width = 170.dp, height = 50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Orange,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Fechar")
+                    Text(
+                        text = "PRONTO",
+                        fontSize = 22.sp
+                    )
                 }
             }
         }
