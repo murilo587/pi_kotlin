@@ -30,6 +30,7 @@ import com.example.tagarela.ui.theme.PurpleMain
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
+import com.example.tagarela.ui.components.Menu
 
 class CardViewModelFactory(private val repository: CardRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -66,6 +67,7 @@ fun SearchScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = { Head() },
+        bottomBar = { Menu(navController) },
         content = { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 if (loading) {
@@ -146,7 +148,7 @@ fun SearchScreen(navController: NavHostController) {
                                     mainAxisSpacing = 8.dp,
                                     crossAxisSpacing = 8.dp,
                                     crossAxisAlignment = FlowCrossAxisAlignment.Start,
-                                    mainAxisAlignment = FlowMainAxisAlignment.Center, // Center the cards horizontally
+                                    mainAxisAlignment = FlowMainAxisAlignment.Center,
                                 ) {
                                     filteredCards.value.forEach { card ->
                                         CardView(

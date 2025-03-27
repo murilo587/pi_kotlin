@@ -49,6 +49,7 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
 
     Scaffold(
         topBar = { Head() },
+        bottomBar = { Menu(navHostController) },
         content = { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 Column(modifier = Modifier.padding(40.dp)) {
@@ -99,7 +100,6 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
                 }
             }
         },
-        bottomBar = { Menu(navHostController) }
     )
 }
 
