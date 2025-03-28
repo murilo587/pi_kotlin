@@ -1,8 +1,10 @@
 package com.example.tagarela.ui.screens
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
@@ -16,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -56,6 +59,7 @@ fun QueueScreen(navController: NavHostController) {
     val textState = remember { mutableStateOf("") }
     val filteredCards = remember { mutableStateOf(listOf<Card>()) }
     val queue = remember { mutableStateListOf<Card>() }
+    val context = LocalContext.current
     val baseUrl = BuildConfig.BASE_IMG_URL
 
     val cards by viewModel.cards.collectAsState()
@@ -88,44 +92,58 @@ fun QueueScreen(navController: NavHostController) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(100.dp)
+                                .height(130.dp)
                                 .padding(bottom = 16.dp)
                                 .background(Color.White)
                                 .border(2.dp, PurpleMain, MaterialTheme.shapes.medium)
-                                .padding(8.dp)
+                                .padding(horizontal = 8.dp, vertical = 35.dp)
                         ) {
-                            FlowRow(
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(84.dp),
-                                mainAxisSpacing = 8.dp,
-                                crossAxisSpacing = 8.dp,
-                                crossAxisAlignment = FlowCrossAxisAlignment.Start,
-                                mainAxisAlignment = FlowMainAxisAlignment.Start
+                                    .height(130.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                queue.forEach { card ->
-                                    Image(
-                                        painter = rememberImagePainter(data = baseUrl + card.image),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(60.dp)
-                                            .clip(MaterialTheme.shapes.medium)
-                                    )
+                                FlowRow(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(130.dp),
+                                    mainAxisSpacing = 8.dp,
+                                    crossAxisSpacing = 8.dp,
+                                    crossAxisAlignment = FlowCrossAxisAlignment.Center,
+                                    mainAxisAlignment = FlowMainAxisAlignment.Center
+                                ) {
+                                    val cardSize = if (queue.size > 3) (180 / queue.size).dp else 60.dp
+
+                                    queue.forEach { card ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(cardSize)
+                                                .align(Alignment.CenterVertically)
+                                        ) {
+                                            Image(
+                                                painter = rememberImagePainter(data = baseUrl + card.image),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .size(130.dp)
+                                                    .clip(MaterialTheme.shapes.medium)
+                                                    .clickable {
+                                                        queue.remove(card)
+                                                    }
+                                            )
+                                        }
+                                    }
                                 }
-                            }
-                        }
-
-
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = { queue.clear() },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                            ) {
-                                Text(text = "Limpar Fila", color = Color.White)
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_delete),
+                                    contentDescription = null,
+                                    tint = PurpleMain,
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .clickable { queue.clear() }
+                                        .padding(start = 8.dp)
+                                )
                             }
                         }
 
@@ -205,7 +223,25 @@ fun QueueScreen(navController: NavHostController) {
                                         CardView(
                                             card = card,
                                             onClick = {
-                                                queue.add(card)
+                                                if (queue.size < 5) {
+                                                    queue.add(card)
+
+                                                    val audioUri = baseUrl + card.audio
+
+                                                    try {
+                                                        val mediaPlayer = MediaPlayer()
+                                                        mediaPlayer.setDataSource(audioUri)
+                                                        mediaPlayer.prepare()
+                                                        mediaPlayer.setOnCompletionListener {
+                                                            mediaPlayer.release()
+                                                        }
+                                                        mediaPlayer.start()
+                                                    } catch (e: Exception) {
+                                                        e.printStackTrace()
+                                                        println("Erro ao reproduzir o áudio: ${e.message}")
+                                                    }
+
+                                                }
                                             }
                                         )
                                     }
