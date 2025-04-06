@@ -43,7 +43,7 @@ fun Menu(navHostController: NavHostController) {
                 )
             }
             Button(
-                onClick = {},
+                onClick = {navHostController.navigate("queue")},
                 modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Transparent
