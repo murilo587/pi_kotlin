@@ -42,6 +42,7 @@ fun SignUpScreen(navHostController: NavHostController) {
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
     val signUpResult by signUpViewModel.signUpResult
+    val signUpStateMessage = signUpViewModel.state
 
     val userPreferences = UserPreferences(context)
     val userId by userPreferences.userId.collectAsState(initial = null)
@@ -167,17 +168,14 @@ fun SignUpScreen(navHostController: NavHostController) {
 
                 signUpResult?.let { result ->
                     if (result.success) {
-                        Text("Cadastro bem-sucedido!")
+                        Text("$signUpStateMessage")
                         LaunchedEffect(userId) {
-                            if (userId != null) {
+                            userId?.let {
                                 navHostController.navigate("search")
                             }
                         }
-                        if (userId == null) {
-                            Text("ID de usuário não encontrado. Por favor, tente novamente.")
-                        }
                     } else {
-                        Text("Falha no cadastro: ${result.error}")
+                        Text("$signUpStateMessage")
                     }
                 }
 

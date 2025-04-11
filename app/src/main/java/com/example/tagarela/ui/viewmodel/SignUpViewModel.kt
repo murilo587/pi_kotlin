@@ -22,22 +22,21 @@ class SignUpViewModel(private val repository: UserRepository, private val userPr
     val state: StateFlow<String?> = _state
 
     fun signUp(username: String, email: String, password: String, repeatPassword: String) {
-        if (password != repeatPassword) {
-            signUpResult.value = Result(success = false, error = "As senhas não coincidem")
-            return
-        }
-
         viewModelScope.launch {
             try {
                 _loading.value = true
-                val request = SignUpRequest(username, email, password)
-                val result = repository.registerUser(request)
-                signUpResult.value = result
-                if (result.success) {
-                    result.userId?.let { userPreferences.saveUserId(it) }
-                    _loading.value = false
-                    _state.value = result.message
+                if (password != repeatPassword) {
+                    _state.value = "Senhas não coincidem"
+                } else {
+                    val request = SignUpRequest(username, email, password)
+                    val result = repository.registerUser(request)
+                    signUpResult.value = result
+                    if (result.success) {
+                        result.userId?.let { userPreferences.saveUserId(it) }
+                        _state.value = result.message
+                    }
                 }
+                _loading.value = false
             } catch (e: Exception) {
                 _loading.value = false
                 _state.value = signUpResult.value?.error
