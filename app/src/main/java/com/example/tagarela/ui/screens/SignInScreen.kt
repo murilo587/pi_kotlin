@@ -40,7 +40,7 @@ fun SignInScreen(navHostController: NavHostController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginResult = loginViewModel.loginResult.value
-
+    val loginStateMessage = loginViewModel.state
     val userPreferences = UserPreferences(context)
     val userId by userPreferences.userId.collectAsState(initial = null)
 
@@ -136,20 +136,19 @@ fun SignInScreen(navHostController: NavHostController) {
 
                 loginResult?.let { result ->
                     if (result.success) {
-                        Text("Login bem-sucedido!")
+                        Text("$loginStateMessage")
                         LaunchedEffect(userId) {
                             if (userId != null) {
                                 navHostController.navigate("settings")
                             }
                         }
                         if (userId == null) {
-                            Text("ID de usuário não encontrado. Por favor, tente novamente.")
+                            Text("$loginStateMessage")
                         }
                     } else {
-                        Text("Falha no login: ${result}")
+                        Text("$loginStateMessage")
                     }
                 }
-
 
                 TextButton(
                     onClick = {navHostController.navigate("signup")},
