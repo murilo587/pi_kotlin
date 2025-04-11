@@ -18,10 +18,9 @@ class UserRepository(private val context: Context) {
             try {
                 val response = RetrofitClient.apiService.signIn(SignInRequest(username, password))
                 editor.apply()
-                Result(success = true, message = "Login successful", userId = response.accessToken)
+                Result(success = true, message = "Login realizado com sucesso", userId = response.accessToken)
             } catch (e: Exception) {
-                val errorMessage = e.message ?: "Login Error"
-                Result(success = false, error = errorMessage)
+                Result(success = false, error = "Falha no login")
             }
         }
     }
@@ -33,10 +32,9 @@ class UserRepository(private val context: Context) {
                 val response = RetrofitClient.apiService.signUp(request)
                 editor.putString("user_id", response.userId)
                 editor.apply()
-                Result(success = true, message = response.message, userId = response.userId)
+                Result(success = true, message = "Cadastro realizado com sucesso", userId = response.userId)
             } catch (e: Exception) {
-                val errorMessage = e.message ?: "Registration Error"
-                Result(success = false, error = errorMessage)
+                Result(success = false, error = "Falha no cadastro")
             }
         }
     }
@@ -48,13 +46,12 @@ class UserRepository(private val context: Context) {
                 if (response.isSuccessful) {
                     response.body()?.let {
                         UserResult(success = true, user = it.user)
-                    } ?: UserResult(success = false, error = "User not found")
+                    } ?: UserResult(success = false, error = "Usuário não encontrado")
                 } else {
-                    UserResult(success = false, error = "Error fetching user data")
+                    UserResult(success = false, error = "Falha ao puxar dados do usuário")
                 }
             } catch (e: Exception) {
-                val errorMessage = e.message ?: "Error fetching user data"
-                UserResult(success = false, error = errorMessage)
+                UserResult(success = false, error = "Falha ao puxar dados do usuário")
             }
         }
     }
@@ -65,13 +62,12 @@ class UserRepository(private val context: Context) {
                 val user = User(email = email, username = username, password = password)
                 val response: Response<UserResponse> = RetrofitClient.apiService.updateUser(userId, user)
                 if (response.isSuccessful) {
-                    Result(success = true, message = "User updated successfully")
+                    Result(success = true, message = "Usuário atualizado com sucesso")
                 } else {
-                    Result(success = false, error = "Error updating user data")
+                    Result(success = false, error = "Falha ao atualizar dados do usuário")
                 }
             } catch (e: Exception) {
-                val errorMessage = e.message ?: "Error updating user data"
-                Result(success = false, error = errorMessage)
+                Result(success = false, error = "Falha ao atualizar dados do usuário")
             }
         }
     }
