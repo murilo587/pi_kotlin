@@ -40,7 +40,7 @@ fun SignInScreen(navHostController: NavHostController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginResult = loginViewModel.loginResult.value
-    val loginStateMessage = loginViewModel.state
+    val signInStateMessage = loginViewModel.state
     val userPreferences = UserPreferences(context)
     val userId by userPreferences.userId.collectAsState(initial = null)
 
@@ -136,17 +136,17 @@ fun SignInScreen(navHostController: NavHostController) {
 
                 loginResult?.let { result ->
                     if (result.success) {
-                        Text("$loginStateMessage")
+                        Text( "${signInStateMessage.value}")
                         LaunchedEffect(userId) {
                             if (userId != null) {
                                 navHostController.navigate("settings")
                             }
                         }
                         if (userId == null) {
-                            Text("$loginStateMessage")
+                            Text( "${signInStateMessage.value}")
                         }
                     } else {
-                        Text("$loginStateMessage")
+                        Text( "${signInStateMessage.value}")
                     }
                 }
 

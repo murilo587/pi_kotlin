@@ -168,7 +168,7 @@ fun SignUpScreen(navHostController: NavHostController) {
 
                 signUpResult?.let { result ->
                     if (result.success) {
-                        Text("$signUpStateMessage")
+                        Text("${signUpStateMessage.value}")
                         LaunchedEffect(userId) {
                             userId?.let {
                                 navHostController.navigate("search")
