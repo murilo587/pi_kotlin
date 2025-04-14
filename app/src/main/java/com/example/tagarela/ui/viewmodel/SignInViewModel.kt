@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class SignInViewModel(private val repository: UserRepository, private val userPreferences: UserPreferences) : ViewModel() {
+class SignInViewModel(
+    private val repository: UserRepository,
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     var loginResult = mutableStateOf<Result<Any?>?>(null)
         private set
@@ -24,18 +27,21 @@ class SignInViewModel(private val repository: UserRepository, private val userPr
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
+            _loading.value = true
             try {
-                _loading.value = true
                 val result = repository.login(username, password)
                 loginResult.value = result
                 if (result.success) {
                     result.userId?.let { userPreferences.saveUserId(it) }
-                    _loading.value = false
+                    result.accessToken?.let { userPreferences.saveAccessToken(it) }
                     _state.value = result.message
+                } else {
+                    _state.value = result.error
                 }
             } catch (e: Exception) {
+                _state.value = "Erro desconhecido ao fazer login"
+            } finally {
                 _loading.value = false
-                _state.value = loginResult.value?.error
             }
         }
     }
