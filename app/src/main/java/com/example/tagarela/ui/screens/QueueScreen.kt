@@ -54,12 +54,12 @@ class CardViewModelFactory(private val repository: CardRepository) : ViewModelPr
 
 @Composable
 fun QueueScreen(navController: NavHostController) {
-    val viewModel: CardViewModel = viewModel(factory = CardViewModelFactory(CardRepository()))
+    val context = LocalContext.current
+    val viewModel: CardViewModel = viewModel(factory = CardViewModelFactory(CardRepository(context)))
 
     val textState = remember { mutableStateOf("") }
     val filteredCards = remember { mutableStateOf(listOf<Card>()) }
     val queue = remember { mutableStateListOf<Card>() }
-    val context = LocalContext.current
     val baseUrl = BuildConfig.BASE_IMG_URL
 
     val cards by viewModel.cards.collectAsState()

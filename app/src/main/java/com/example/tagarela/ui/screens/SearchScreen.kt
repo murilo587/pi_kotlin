@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.TextStyle
@@ -44,7 +45,8 @@ class CardViewModelFactory(private val repository: CardRepository) : ViewModelPr
 
 @Composable
 fun SearchScreen(navController: NavHostController) {
-    val viewModel: CardViewModel = viewModel(factory = CardViewModelFactory(CardRepository()))
+    val context = LocalContext.current
+    val viewModel: CardViewModel = viewModel(factory = CardViewModelFactory(CardRepository(context)))
 
     val textState = remember { mutableStateOf("") }
     val filteredCards = remember { mutableStateOf(listOf<Card>()) }
