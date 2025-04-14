@@ -1,10 +1,13 @@
 package com.example.tagarela.data.repository
 
+import android.content.Context
 import com.example.tagarela.data.api.RetrofitClient
 import com.example.tagarela.data.models.Card
 
-class CardRepository {
+class CardRepository(private val context: Context) {
+
+    private val apiService = RetrofitClient.createApiService(context)
     suspend fun getAllCards(): List<Card> {
-        return RetrofitClient.apiService.getAllItems()
+        return apiService.getAllItems()
     }
 }
