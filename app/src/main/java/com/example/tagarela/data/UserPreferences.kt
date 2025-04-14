@@ -13,15 +13,25 @@ class UserPreferences(context: Context) {
 
     private val dataStore = context.dataStore
     private val USER_ID_KEY = stringPreferencesKey("user_id")
+    private val USER_ACCESS_TOKEN = stringPreferencesKey("access_token")
 
     val userId: Flow<String?> = dataStore.data
         .map { preferences ->
             preferences[USER_ID_KEY]
         }
+    val accessToken: Flow<String?> = dataStore.data
+        .map { preferences ->
+            preferences[USER_ACCESS_TOKEN]
+        }
 
     suspend fun saveUserId(userId: String) {
         dataStore.edit { preferences ->
             preferences[USER_ID_KEY] = userId
+        }
+    }
+    suspend fun saveAccessToken(accessToken: String) {
+        dataStore.edit { preferences ->
+            preferences[USER_ACCESS_TOKEN] = accessToken
         }
     }
 }
