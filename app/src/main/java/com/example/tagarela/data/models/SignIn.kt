@@ -6,5 +6,6 @@ data class SignInRequest(
 )
 data class SignInResponse(
     val accessToken: String,
-    val tokenType: String
+    val tokenType: String,
+    val id: String
 )
