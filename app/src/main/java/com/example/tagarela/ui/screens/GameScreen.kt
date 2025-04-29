@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -34,6 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.tagarela.ui.components.Head
 import com.example.tagarela.ui.components.Menu
+import com.example.tagarela.ui.theme.Purple40
 
 @Composable
 fun GameScreen(navController: NavHostController) {
@@ -49,14 +52,19 @@ fun GameScreen(navController: NavHostController) {
 
     val baseUrl = BuildConfig.BASE_IMG_URL
     var selectedAnswerIndex by remember { mutableStateOf(-1) }
-    var buttonColors by remember { mutableStateOf(listOf(
-        Color(0xFFFFE647),
-        Color(0xFFFA0000),
-        Color(0xFF1A7BF2),
-        Color(0xFF494949)
-    )) }
+    var buttonColors by remember {
+        mutableStateOf(
+            listOf(
+                Color(0xFFFFE647),
+                Color(0xFFFA0000),
+                Color(0xFF1A7BF2),
+                Color(0xFF494949)
+            )
+        )
+    }
     var imageAlpha by remember { mutableStateOf(1f) }
     var cardSizes by remember { mutableStateOf(List(4) { 120.dp }) }
+    var showCongratsDialog by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
@@ -75,8 +83,55 @@ fun GameScreen(navController: NavHostController) {
 
     LaunchedEffect(isQuizFinished) {
         if (isQuizFinished) {
-            navController.navigate("settings")
+            showCongratsDialog = true
+            coroutineScope.launch {
+                delay(3000)
+                showCongratsDialog = false
+                navController.navigate("settings")
+            }
         }
+    }
+
+    if (showCongratsDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.congrats_image),
+                        contentDescription = "Imagem de Parabéns",
+                        modifier = Modifier.size(130.dp)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(text = "Parabéns", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Você concluiu o Quiz!", fontSize = 15.sp)
+                }
+            },
+            confirmButton = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = {
+                            showCongratsDialog = false
+                            navController.navigate("settings")
+                        },
+                        modifier = Modifier.width(120.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("PRONTO")
+                    }
+                }
+            }
+
+        )
     }
 
     Scaffold(
@@ -85,7 +140,9 @@ fun GameScreen(navController: NavHostController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(15.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(15.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -96,7 +153,10 @@ fun GameScreen(navController: NavHostController) {
                     val currentGame = games.getOrNull(currentGameIndex)
 
                     if (currentGame != null) {
-                        Text(text = "Nível 1 - Questão ${currentGameIndex + 1}/${games.size}", fontSize = 18.sp)
+                        Text(
+                            text = "Nível 1 - Questão ${currentGameIndex + 1}/${games.size}",
+                            fontSize = 18.sp
+                        )
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 10.dp, horizontal = 12.dp),
@@ -113,9 +173,14 @@ fun GameScreen(navController: NavHostController) {
                                     }
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth().height(200.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
                             update = { videoView ->
-                                val videoUri = Uri.parse(baseUrl + (currentGame.items.getOrNull(currentGame.correctAnswer)?.video ?: ""))
+                                val videoUri = Uri.parse(
+                                    baseUrl + (currentGame.items.getOrNull(currentGame.correctAnswer)?.video
+                                        ?: "")
+                                )
 
                                 videoView.stopPlayback()
                                 videoView.setVideoURI(videoUri)
@@ -137,71 +202,77 @@ fun GameScreen(navController: NavHostController) {
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
-                                    currentGame.items.subList(start, end).forEachIndexed { index, item ->
-                                        val actualIndex = start + index
-                                        val animatedSize by animateDpAsState(
-                                            targetValue = if (selectedAnswerIndex == actualIndex) 140.dp else 120.dp,
-                                            animationSpec = tween(durationMillis = 1000),
-                                            label = "Card Size Animation"
-                                        )
-                                        val animatedWidth by animateDpAsState(
-                                            targetValue = if (selectedAnswerIndex == actualIndex) 170.dp else 150.dp,
-                                            animationSpec = tween(durationMillis = 1000),
-                                            label = "Card Width Animation"
-                                        )
+                                    currentGame.items.subList(start, end)
+                                        .forEachIndexed { index, item ->
+                                            val actualIndex = start + index
+                                            val animatedSize by animateDpAsState(
+                                                targetValue = if (selectedAnswerIndex == actualIndex) 140.dp else 120.dp,
+                                                animationSpec = tween(durationMillis = 1000),
+                                                label = "Card Size Animation"
+                                            )
+                                            val animatedWidth by animateDpAsState(
+                                                targetValue = if (selectedAnswerIndex == actualIndex) 170.dp else 150.dp,
+                                                animationSpec = tween(durationMillis = 1000),
+                                                label = "Card Width Animation"
+                                            )
 
-                                        Card(
-                                            modifier = Modifier
-                                                .height(animatedSize)
-                                                .width(animatedWidth)
-                                                .clickable {
-                                                    selectedAnswerIndex = actualIndex
-                                                    val isCorrect = actualIndex == currentGame.correctAnswer
+                                            Card(
+                                                modifier = Modifier
+                                                    .height(animatedSize)
+                                                    .width(animatedWidth)
+                                                    .clickable {
+                                                        selectedAnswerIndex = actualIndex
+                                                        val isCorrect =
+                                                            actualIndex == currentGame.correctAnswer
 
-                                                    buttonColors = buttonColors.mapIndexed { i, color ->
-                                                        if (i == actualIndex) {
-                                                            if (isCorrect) Color.Green else Color.Red
-                                                        } else color
-                                                    }
+                                                        buttonColors =
+                                                            buttonColors.mapIndexed { i, color ->
+                                                                if (i == actualIndex) {
+                                                                    if (isCorrect) Color.Green else Color.Red
+                                                                } else color
+                                                            }
 
-                                                    playSound(context, if (isCorrect) R.raw.correct_answer else R.raw.wrong_answer)
-
-                                                    imageAlpha = 0.5f
-
-                                                    coroutineScope.launch {
-                                                        delay(200)
-                                                        imageAlpha = 1f
-                                                        delay(1000)
-                                                        selectedAnswerIndex = -1
-                                                        delay(2000)
-                                                        if (isCorrect) {
-                                                            viewModel.nextGame()
-                                                        }
-                                                        buttonColors = listOf(
-                                                            Color(0xFFFFE647),
-                                                            Color(0xFFFA0000),
-                                                            Color(0xFF1A7BF2),
-                                                            Color(0xFF494949)
+                                                        playSound(
+                                                            context,
+                                                            if (isCorrect) R.raw.correct_answer else R.raw.wrong_answer
                                                         )
-                                                    }
-                                                },
-                                            shape = RoundedCornerShape(16.dp),
-                                            colors = CardDefaults.cardColors(containerColor = buttonColors[actualIndex])
-                                        ) {
-                                            Box(
-                                                modifier = Modifier.fillMaxSize(),
-                                                contentAlignment = Alignment.Center
+
+                                                        imageAlpha = 0.5f
+
+                                                        coroutineScope.launch {
+                                                            delay(200)
+                                                            imageAlpha = 1f
+                                                            delay(1000)
+                                                            selectedAnswerIndex = -1
+                                                            delay(2000)
+                                                            if (isCorrect) {
+                                                                viewModel.nextGame()
+                                                            }
+                                                            buttonColors = listOf(
+                                                                Color(0xFFFFE647),
+                                                                Color(0xFFFA0000),
+                                                                Color(0xFF1A7BF2),
+                                                                Color(0xFF494949)
+                                                            )
+                                                        }
+                                                    },
+                                                shape = RoundedCornerShape(16.dp),
+                                                colors = CardDefaults.cardColors(containerColor = buttonColors[actualIndex])
                                             ) {
-                                                Image(
-                                                    painter = rememberImagePainter(baseUrl + item.image),
-                                                    contentDescription = "Alternativa ${actualIndex + 1}",
-                                                    modifier = Modifier
-                                                        .size(90.dp)
-                                                        .graphicsLayer(alpha = imageAlpha)
-                                                )
+                                                Box(
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Image(
+                                                        painter = rememberImagePainter(baseUrl + item.image),
+                                                        contentDescription = "Alternativa ${actualIndex + 1}",
+                                                        modifier = Modifier
+                                                            .size(90.dp)
+                                                            .graphicsLayer(alpha = imageAlpha)
+                                                    )
+                                                }
                                             }
                                         }
-                                    }
                                 }
                             }
                         }
@@ -213,7 +284,6 @@ fun GameScreen(navController: NavHostController) {
         }
     }
 }
-
 
 class GameViewModelFactory(private val repository: GameRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
