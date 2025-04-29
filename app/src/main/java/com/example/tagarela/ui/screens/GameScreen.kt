@@ -84,8 +84,9 @@ fun GameScreen(navController: NavHostController) {
     LaunchedEffect(isQuizFinished) {
         if (isQuizFinished) {
             showCongratsDialog = true
+            playSound(context, R.raw.game_victory)
             coroutineScope.launch {
-                delay(3000)
+                delay(4000)
                 showCongratsDialog = false
                 navController.navigate("settings")
             }
