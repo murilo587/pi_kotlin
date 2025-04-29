@@ -1,48 +1,48 @@
 package com.example.tagarela.ui.viewmodel
 
+import Game
+import GameResponse
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tagarela.data.models.Question
 import com.example.tagarela.data.repository.GameRepository
-import com.example.tagarela.data.repository.GameResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
-    private val _gameState = MutableStateFlow<GameResult<List<Question>>>(GameResult(success = false, data = emptyList()))
-    val gameState: StateFlow<GameResult<List<Question>>> get() = _gameState
+    private val _gameResponse = MutableStateFlow<GameResponse?>(null)
+    val gameResponse: StateFlow<GameResponse?> get() = _gameResponse
 
-    private val _loading = MutableStateFlow(false)
+    private val _currentGameIndex = MutableStateFlow(0)
+    val currentGameIndex: StateFlow<Int> get() = _currentGameIndex
+
+    private val _isQuizFinished = MutableStateFlow(false)
+    val isQuizFinished: StateFlow<Boolean> get() = _isQuizFinished
+
+    private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> get() = _loading
 
-    private val _currentQuestionIndex = MutableStateFlow(0)
-    val currentQuestionIndex: StateFlow<Int> get() = _currentQuestionIndex
+    val games: List<Game> get() = _gameResponse.value?.games ?: emptyList()
 
-    fun loadGameData(level: Int) {
+    init {
+        loadGameData()
+    }
+
+    fun loadGameData() {
         viewModelScope.launch {
-            try {
-                _loading.value = true
-                val result = repository.fetchQuizData(level)
-                _gameState.value = result
-                if (result.success && !result.data.isNullOrEmpty()) {
-                    _currentQuestionIndex.value = 0
-                }
-            } catch (e: Exception) {
-                _gameState.value = GameResult(success = false, error = e.message)
-            } finally {
-                _loading.value = false
-            }
+            _loading.value = true
+            val gameData = repository.getGameData()
+            _gameResponse.value = gameData
+            _loading.value = false
         }
     }
 
-    fun onAnswerSelected(selectedIndex: Int) {
-        val currentQuestion = _gameState.value.data?.getOrNull(_currentQuestionIndex.value)
-        if (currentQuestion?.correctAnswerIndex == selectedIndex) {
-            if (_currentQuestionIndex.value < (_gameState.value.data?.size ?: 0) - 1) {
-                _currentQuestionIndex.value++
-            }
+    fun nextGame() {
+        if (_currentGameIndex.value < games.size - 1) {
+            _currentGameIndex.value += 1
+        } else {
+            _isQuizFinished.value = true
         }
     }
 }

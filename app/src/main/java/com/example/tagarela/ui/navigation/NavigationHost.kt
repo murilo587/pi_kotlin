@@ -12,15 +12,19 @@ import com.example.tagarela.ui.screens.SignUpScreen
 import com.example.tagarela.ui.screens.MyAccountScreen
 import com.example.tagarela.ui.screens.EditAccountScreen
 import com.example.tagarela.ui.screens.QueueScreen
+import com.example.tagarela.ui.screens.GameMenuScreen
+import com.example.tagarela.ui.screens.GameScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "signin", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "gamemenu", modifier = modifier) {
         composable("signin") { SignInScreen(navController) }
         composable("search") { SearchScreen(navController) }
         composable("settings") { SettingsScreen(navController)}
         composable("signup") { SignUpScreen(navController)}
         composable("queue") { QueueScreen(navController)}
+        composable("gamemenu") { GameMenuScreen(navController) }
+        composable("game") { GameScreen(navController)}
         composable("myaccount/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             userId?.let { MyAccountScreen(navController, it) }

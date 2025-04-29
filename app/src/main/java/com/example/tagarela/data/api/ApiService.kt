@@ -1,5 +1,6 @@
 package com.example.tagarela.data.api
 
+import GameResponse
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.data.models.SignInRequest
 import com.example.tagarela.data.models.SignInResponse
@@ -24,6 +25,8 @@ interface ApiService {
     suspend fun getAllItems(): List<Card>
     @GET("user/{id}")
     fun getUser(@Path("id") userId: String): Call<UserResponse>
+    @GET("quiz/random")
+    suspend fun fetchAllQuizzes(): GameResponse
     @PUT("user/{id}")
     suspend fun updateUser(@Path("id") id: String, @Body user: User): Response<UserResponse>
 }
