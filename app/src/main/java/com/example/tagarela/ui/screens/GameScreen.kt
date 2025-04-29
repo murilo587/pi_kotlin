@@ -1,5 +1,8 @@
 package com.example.tagarela.ui.screens
 
+import android.content.Context
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.widget.VideoView
 import androidx.compose.animation.core.animateDpAsState
@@ -24,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.example.tagarela.BuildConfig
+import com.example.tagarela.R
 import com.example.tagarela.ui.viewmodel.GameViewModel
 import com.example.tagarela.data.repository.GameRepository
 import kotlinx.coroutines.delay
@@ -55,6 +59,15 @@ fun GameScreen(navController: NavHostController) {
     var cardSizes by remember { mutableStateOf(List(4) { 120.dp }) }
 
     val coroutineScope = rememberCoroutineScope()
+    val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
+
+    fun playSound(context: Context, soundResId: Int) {
+        val mediaPlayer = MediaPlayer.create(context, soundResId)
+        mediaPlayer?.apply {
+            setOnCompletionListener { release() }
+            start()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadGameData()
@@ -151,6 +164,8 @@ fun GameScreen(navController: NavHostController) {
                                                         } else color
                                                     }
 
+                                                    playSound(context, if (isCorrect) R.raw.correct_answer else R.raw.wrong_answer)
+
                                                     imageAlpha = 0.5f
 
                                                     coroutineScope.launch {
@@ -198,6 +213,7 @@ fun GameScreen(navController: NavHostController) {
         }
     }
 }
+
 
 class GameViewModelFactory(private val repository: GameRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
