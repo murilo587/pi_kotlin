@@ -1,3 +1,5 @@
+package com.example.tagarela.ui.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,28 +27,13 @@ import com.example.tagarela.ui.components.Head
 import com.example.tagarela.ui.components.CustomModal
 import com.example.tagarela.data.repository.CardRepository
 import com.example.tagarela.ui.components.CardView
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.tagarela.ui.theme.PurpleMain
-import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.accompanist.flowlayout.FlowRow
 import com.example.tagarela.ui.components.Menu
-
-class CardViewModelFactory(private val repository: CardRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CardViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CardViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
 
 @Composable
 fun SearchScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val viewModel: CardViewModel = viewModel(factory = CardViewModelFactory(CardRepository(context)))
+    val viewModel: CardViewModel = viewModel(factory = CardViewModel.Factory(CardRepository(context))) // 🔹 Agora usa a Factory dentro da CardViewModel
 
     val textState = remember { mutableStateOf("") }
     val filteredCards = remember { mutableStateOf(listOf<Card>()) }
@@ -104,17 +91,14 @@ fun SearchScreen(navController: NavHostController) {
                                     Spacer(modifier = Modifier.width(15.dp))
                                     BasicTextField(
                                         value = textState.value,
-                                        onValueChange = {
-                                            textState.value = it
-                                        },
+                                        onValueChange = { textState.value = it },
                                         modifier = Modifier
                                             .weight(1f)
                                             .background(PurpleMain)
                                             .padding(horizontal = 8.dp, vertical = 12.dp),
                                         singleLine = true,
                                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                                        keyboardActions = KeyboardActions(onSearch = {
-                                        }),
+                                        keyboardActions = KeyboardActions(onSearch = {}),
                                         textStyle = TextStyle(color = Color.White, fontSize = 20.sp),
                                         cursorBrush = SolidColor(Color.Black),
                                         decorationBox = { innerTextField ->
@@ -138,30 +122,22 @@ fun SearchScreen(navController: NavHostController) {
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
                         }
+
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .padding(top = 8.dp)
                         ) {
-                            item {
-                                FlowRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    mainAxisSpacing = 8.dp,
-                                    crossAxisSpacing = 8.dp,
-                                    crossAxisAlignment = FlowCrossAxisAlignment.Start,
-                                    mainAxisAlignment = FlowMainAxisAlignment.Center,
-                                ) {
-                                    filteredCards.value.forEach { card ->
-                                        CardView(
-                                            card = card,
-                                            onClick = {
-                                                selectedCard.value = card
-                                                modalVisible.value = true
-                                            }
-                                        )
+                            items(filteredCards.value.size) { index ->
+                                val card = filteredCards.value[index]
+                                CardView(
+                                    card = card,
+                                    onClick = {
+                                        selectedCard.value = card
+                                        modalVisible.value = true
                                     }
-                                }
+                                )
                             }
                         }
                     }

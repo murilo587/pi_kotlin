@@ -1,6 +1,7 @@
 package com.example.tagarela.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.data.repository.CardRepository
@@ -23,17 +24,27 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
         fetchAllCards()
     }
 
-    private fun fetchAllCards() {
+    fun fetchAllCards() {
         _loading.value = true
         viewModelScope.launch {
             try {
-                _cards.value = repository.getAllCards()
+                val cardsResponse = repository.getAllCards()
+                _cards.value = cardsResponse
                 _error.value = null
             } catch (e: Exception) {
-                _error.value = e.message ?: "Erro ao carregar"
-            } finally {
-                _loading.value = false
+                _error.value = e.message ?: "Erro ao carregar os cartões"
             }
+            _loading.value = false
+        }
+    }
+
+    class Factory(private val repository: CardRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(CardViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return CardViewModel(repository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }
