@@ -25,6 +25,8 @@ interface ApiService {
     suspend fun getAllItems(): List<Card>
     @GET("item/{id}")
     suspend fun getCardById(@Path("id") cardId: String): Card
+    @GET("item/recents")
+    suspend fun getRecentCards(): List<Card>
     @GET("user/{id}")
     fun getUser(@Path("id") userId: String): Call<UserResponse>
     @GET("quiz/random")

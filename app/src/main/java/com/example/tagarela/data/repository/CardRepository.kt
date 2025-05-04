@@ -13,7 +13,10 @@ class CardRepository(private val context: Context) {
     }
 
     suspend fun getCardById(cardId: String): Card {
-        println("Buscando card ID na API: $cardId") // 🔹 Log para verificar se o ID está correto
         return apiService.getCardById(cardId)
+    }
+
+    suspend fun getRecentCards(): List<Card> {
+        return apiService.getRecentCards()
     }
 }

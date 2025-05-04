@@ -14,6 +14,9 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
     private val _cards = MutableStateFlow<List<Card>>(emptyList())
     val cards: StateFlow<List<Card>> = _cards
 
+    private val _recentCards = MutableStateFlow<List<Card>>(emptyList())
+    val recentCards: StateFlow<List<Card>> = _recentCards
+
     private val _selectedCard = MutableStateFlow<Card?>(null)
     val selectedCard: StateFlow<Card?> = _selectedCard
 
@@ -25,6 +28,7 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
 
     init {
         fetchAllCards()
+        fetchRecentCards()
     }
 
     fun fetchAllCards() {
@@ -41,18 +45,29 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
         }
     }
 
+    fun fetchRecentCards() {
+        _loading.value = true
+        viewModelScope.launch {
+            try {
+                val recentCardsResponse = repository.getRecentCards()
+                _recentCards.value = recentCardsResponse
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Erro ao carregar os cartões recentes"
+            }
+            _loading.value = false
+        }
+    }
+
     fun fetchCardDetails(cardId: String) {
-        println("Executando fetchCardDetails para ID: $cardId")
         _loading.value = true
         viewModelScope.launch {
             try {
                 val cardDetails = repository.getCardById(cardId)
-                println("Repo: ${cardDetails}")
                 _selectedCard.value = cardDetails
                 _error.value = null
             } catch (e: Exception) {
                 _error.value = e.message ?: "Erro ao buscar detalhes do card"
-                println("erro aqui ${e.message}")
             }
             _loading.value = false
         }
