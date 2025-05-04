@@ -23,6 +23,8 @@ interface ApiService {
     suspend fun signUp(@Body request: SignUpRequest): SignUpResponse
     @GET("item")
     suspend fun getAllItems(): List<Card>
+    @GET("item/{id}")
+    suspend fun getCardById(@Path("id") cardId: String): Card
     @GET("user/{id}")
     fun getUser(@Path("id") userId: String): Call<UserResponse>
     @GET("quiz/random")

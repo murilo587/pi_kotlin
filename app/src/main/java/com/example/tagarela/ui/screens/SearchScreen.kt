@@ -1,8 +1,10 @@
 package com.example.tagarela.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,27 +32,24 @@ import com.example.tagarela.ui.components.CardView
 import com.example.tagarela.ui.theme.PurpleMain
 import com.example.tagarela.ui.components.Menu
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val viewModel: CardViewModel = viewModel(factory = CardViewModel.Factory(CardRepository(context))) // 🔹 Agora usa a Factory dentro da CardViewModel
+    val viewModel: CardViewModel = viewModel(factory = CardViewModel.Factory(CardRepository(context)))
 
     val textState = remember { mutableStateOf("") }
     val filteredCards = remember { mutableStateOf(listOf<Card>()) }
     val modalVisible = remember { mutableStateOf(false) }
-    val selectedCard = remember { mutableStateOf<Card?>(null) }
+    val selectedCardId = remember { mutableStateOf<String?>(null) }
 
     val cards by viewModel.cards.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
 
     LaunchedEffect(cards, textState.value) {
-        filteredCards.value = if (textState.value.isEmpty()) {
-            cards
-        } else {
-            cards.filter { card ->
-                card.name.contains(textState.value, ignoreCase = true)
-            }
+        filteredCards.value = cards.filter { card ->
+            textState.value.isEmpty() || card.name.contains(textState.value, ignoreCase = true)
         }
     }
 
@@ -116,25 +115,21 @@ fun SearchScreen(navController: NavHostController) {
                         }
 
                         error?.let {
-                            Text(
-                                it,
-                                color = Color.Red,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
+                            Text(it, color = Color.Red, modifier = Modifier.align(Alignment.CenterHorizontally))
                         }
-
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .padding(top = 8.dp)
+                        Spacer(modifier = Modifier.height(15.dp))
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(3),
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(1.dp)
                         ) {
                             items(filteredCards.value.size) { index ->
                                 val card = filteredCards.value[index]
                                 CardView(
                                     card = card,
                                     onClick = {
-                                        selectedCard.value = card
+                                        selectedCardId.value = card.id
                                         modalVisible.value = true
                                     }
                                 )
@@ -146,9 +141,7 @@ fun SearchScreen(navController: NavHostController) {
         }
     )
 
-    if (modalVisible.value) {
-        selectedCard.value?.let {
-            CustomModal(card = it, onClose = { modalVisible.value = false })
-        }
+    if (modalVisible.value && selectedCardId.value != null) {
+        CustomModal(cardId = selectedCardId.value!!, onClose = { modalVisible.value = false }, viewModel = viewModel)
     }
 }
