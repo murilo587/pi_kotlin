@@ -1,7 +1,6 @@
 package com.example.tagarela.ui.screens
 
 import android.content.Context
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.widget.VideoView

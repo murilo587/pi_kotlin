@@ -15,10 +15,11 @@ import com.example.tagarela.ui.screens.GameMenuScreen
 import com.example.tagarela.ui.screens.GameScreen
 import com.example.tagarela.ui.screens.SearchScreen
 import com.example.tagarela.ui.screens.HomeScreen
+import com.example.tagarela.ui.screens.RegisterCardScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "home", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "registercard", modifier = modifier) {
         composable("signin") { SignInScreen(navController) }
         composable("search") { SearchScreen(navController) }
         composable("settings") { SettingsScreen(navController)}
@@ -27,6 +28,7 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
         composable("gamemenu") { GameMenuScreen(navController) }
         composable("game") { GameScreen(navController)}
         composable("home") { HomeScreen(navController)}
+        composable("registercard") { RegisterCardScreen(navController)}
         composable("myaccount/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
             userId?.let { MyAccountScreen(navController, it) }
