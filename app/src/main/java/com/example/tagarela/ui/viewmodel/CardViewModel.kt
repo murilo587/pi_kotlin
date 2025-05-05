@@ -17,6 +17,9 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
     private val _recentCards = MutableStateFlow<List<Card>>(emptyList())
     val recentCards: StateFlow<List<Card>> = _recentCards
 
+    private val _mostUsedCards = MutableStateFlow<List<Card>>(emptyList())
+    val mostUsedCards: StateFlow<List<Card>> = _mostUsedCards
+
     private val _selectedCard = MutableStateFlow<Card?>(null)
     val selectedCard: StateFlow<Card?> = _selectedCard
 
@@ -51,6 +54,20 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
             try {
                 val recentCardsResponse = repository.getRecentCards()
                 _recentCards.value = recentCardsResponse
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Erro ao carregar os cartões recentes"
+            }
+            _loading.value = false
+        }
+    }
+
+    fun fetchMostUsedCards() {
+        _loading.value = true
+        viewModelScope.launch {
+            try {
+                val mostUsedCardsResponse = repository.getMostUsedCards()
+                _mostUsedCards.value = mostUsedCardsResponse
                 _error.value = null
             } catch (e: Exception) {
                 _error.value = e.message ?: "Erro ao carregar os cartões recentes"

@@ -28,7 +28,7 @@ fun Menu(navHostController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = {},
+                onClick = {navHostController.navigate("home")},
                 modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Transparent

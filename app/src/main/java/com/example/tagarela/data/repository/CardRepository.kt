@@ -19,4 +19,8 @@ class CardRepository(private val context: Context) {
     suspend fun getRecentCards(): List<Card> {
         return apiService.getRecentCards()
     }
+
+    suspend fun getMostUsedCards(): List<Card> {
+        return apiService.getMostUsedCards()
+    }
 }
