@@ -2,9 +2,6 @@ package com.example.tagarela.data.api
 
 import android.content.Context
 import com.example.tagarela.utils.AuthInterceptor
-import com.example.tagarela.data.UserPreferences
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -15,14 +12,9 @@ object RetrofitClient {
     private const val BASE_URL = "http://10.0.2.2:8080/v1/"
 
     fun createApiService(context: Context): ApiService {
-        val userPreferences = UserPreferences(context)
-
-        val token = runBlocking {
-            userPreferences.accessToken.first() ?: ""
-        }
 
         val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(token))
+            .addInterceptor(AuthInterceptor(context))
             .addInterceptor(MultipartInterceptor())
             .build()
 
@@ -50,9 +42,11 @@ class MultipartInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
 
-        // Verifica se a requisição contém partes multipart
         val isMultipartRequest = request.headers["Content-Type"]?.contains("multipart/form-data") == true
-
+        println("🔍 Headers antes de enviar a requisição:")
+        request.headers.forEach { header ->
+            println("${header.first}: ${header.second}")
+        }
         return if (isMultipartRequest) {
             val newRequest = request.newBuilder()
                 .addHeader("Content-Type", "multipart/form-data")

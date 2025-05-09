@@ -57,7 +57,7 @@ fun SignUpScreen(navHostController: NavHostController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Purple40),
+                .background(Orange),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -150,7 +150,7 @@ fun SignUpScreen(navHostController: NavHostController) {
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
                     onClick = { signUpViewModel.signUp(nickname, email, password, repeatPassword) },

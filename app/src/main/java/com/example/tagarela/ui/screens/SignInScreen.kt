@@ -54,7 +54,7 @@ fun SignInScreen(navHostController: NavHostController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFFFA700)),
+                .background(Orange),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

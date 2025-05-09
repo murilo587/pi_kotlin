@@ -14,24 +14,41 @@ class UserPreferences(context: Context) {
     private val dataStore = context.dataStore
     private val USER_ID_KEY = stringPreferencesKey("user_id")
     private val USER_ACCESS_TOKEN = stringPreferencesKey("access_token")
+    private val XSRF_TOKEN_KEY = stringPreferencesKey("xsrf_token")
 
     val userId: Flow<String?> = dataStore.data
         .map { preferences ->
             preferences[USER_ID_KEY]
         }
+
     val accessToken: Flow<String?> = dataStore.data
         .map { preferences ->
             preferences[USER_ACCESS_TOKEN]
         }
 
+    val xsrfToken: Flow<String?> = dataStore.data
+        .map { preferences ->
+            preferences[XSRF_TOKEN_KEY]
+        }
+
     suspend fun saveUserId(userId: String) {
+        println("id pra teste: ${userId}")
         dataStore.edit { preferences ->
             preferences[USER_ID_KEY] = userId
         }
     }
+
     suspend fun saveAccessToken(accessToken: String) {
+        println("token pra teste: ${accessToken}")
         dataStore.edit { preferences ->
             preferences[USER_ACCESS_TOKEN] = accessToken
+        }
+    }
+
+    suspend fun saveXsrfToken(xsrfToken: String) {
+        println("SALVOU ESSA BOSTA: ${xsrfToken}")
+        dataStore.edit { preferences ->
+            preferences[XSRF_TOKEN_KEY] = xsrfToken
         }
     }
 }

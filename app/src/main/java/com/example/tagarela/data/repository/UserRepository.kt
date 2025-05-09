@@ -2,6 +2,7 @@ package com.example.tagarela.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.tagarela.data.UserPreferences
 import com.example.tagarela.data.models.*
 import com.example.tagarela.data.api.RetrofitClient
 import kotlinx.coroutines.Dispatchers
@@ -12,16 +13,52 @@ class UserRepository(private val context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     private val unauthenticatedApiService = RetrofitClient.createUnauthenticatedApiService()
     private val authenticatedApiService = RetrofitClient.createApiService(context)
+
+    // Inicializando o UserPreferences diretamente dentro do repositório
+    private val userPreferences = UserPreferences(context)
+
     suspend fun login(username: String, password: String): Result<Any?> {
         return withContext(Dispatchers.IO) {
             val editor = sharedPreferences.edit()
             try {
                 val response = unauthenticatedApiService.signIn(SignInRequest(username, password))
-                editor.apply()
-                println("Login com sucesso")
-                Result(success = true, message = "Login realizado com sucesso", userId = response.id, accessToken= response.accessToken)
+
+                if (response.isSuccessful) {
+
+                    val xsrfToken = response.headers()["X-XSRF-TOKEN"]
+                    xsrfToken?.let {
+                        editor.putString("xsrf_token", xsrfToken)
+                        editor.apply()
+                        userPreferences.saveXsrfToken(xsrfToken)
+                        println("CSRF Token capturado: $xsrfToken")
+                    }
+
+                    val body = response.body()
+                    if (body != null) {
+                        editor.putString("access_token", body.accessToken)
+                        editor.putString("user_id", body.id.toString())
+                        editor.apply()
+
+                        userPreferences.saveAccessToken(body.accessToken)
+                        userPreferences.saveUserId(body.id.toString())
+
+                        println("Access Token: ${body.accessToken}")
+                        println("User ID: ${body.id}")
+
+                        return@withContext Result(
+                            success = true,
+                            message = "Login realizado com sucesso",
+                            userId = body.id,
+                            accessToken = body.accessToken
+                        )
+                    } else {
+                        return@withContext Result(success = false, error = "Resposta vazia do servidor")
+                    }
+                } else {
+                    return@withContext Result(success = false, error = "Falha no login: ${response.message()}")
+                }
             } catch (e: Exception) {
-                Result(success = false, error = "Falha no login")
+                return@withContext Result(success = false, error = "Falha no login: ${e.message}")
             }
         }
     }
@@ -33,6 +70,9 @@ class UserRepository(private val context: Context) {
                 val response = unauthenticatedApiService.signUp(request)
                 editor.putString("user_id", response.userId)
                 editor.apply()
+
+                userPreferences.saveUserId(response.userId)
+
                 Result(success = true, message = "Cadastro realizado com sucesso", userId = response.userId)
             } catch (e: Exception) {
                 Result(success = false, error = "Falha no cadastro")
