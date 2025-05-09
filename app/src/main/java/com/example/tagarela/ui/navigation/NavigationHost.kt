@@ -19,7 +19,7 @@ import com.example.tagarela.ui.screens.RegisterCardScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "registercard", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "signin", modifier = modifier) {
         composable("signin") { SignInScreen(navController) }
         composable("search") { SearchScreen(navController) }
         composable("settings") { SettingsScreen(navController)}

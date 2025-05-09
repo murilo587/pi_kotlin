@@ -14,7 +14,6 @@ class UserRepository(private val context: Context) {
     private val unauthenticatedApiService = RetrofitClient.createUnauthenticatedApiService()
     private val authenticatedApiService = RetrofitClient.createApiService(context)
 
-    // Inicializando o UserPreferences diretamente dentro do repositório
     private val userPreferences = UserPreferences(context)
 
     suspend fun login(username: String, password: String): Result<Any?> {

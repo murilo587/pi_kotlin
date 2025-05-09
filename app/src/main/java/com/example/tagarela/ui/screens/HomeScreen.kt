@@ -53,9 +53,6 @@ fun HomeScreen(navController: NavHostController) {
         bottomBar = { Menu(navController) },
         content = { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-                if (loading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize().padding(16.dp)
                     ) {
@@ -226,7 +223,6 @@ fun HomeScreen(navController: NavHostController) {
                         }
                     }
                 }
-            }
         }
     )
 

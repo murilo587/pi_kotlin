@@ -58,6 +58,15 @@ fun CustomModal(cardId: String, onClose: () -> Unit, viewModel: CardViewModel) {
     val cardDetails by viewModel.selectedCard.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
+    var showError by remember { mutableStateOf(false) }
+
+    // Mostrar a mensagem de erro após um tempo, se não conseguir carregar os dados
+    LaunchedEffect(loading) {
+        if (!loading && cardDetails == null) {
+            showError = true
+        }
+    }
+
     if (loading) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -140,7 +149,7 @@ fun CustomModal(cardId: String, onClose: () -> Unit, viewModel: CardViewModel) {
                 }
             }
         }
-    } else {
+    } else if (showError) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
