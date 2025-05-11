@@ -41,7 +41,7 @@ class UserRepository(private val context: Context) {
                         editor.putString("user_id", body.id.toString())
                         editor.apply()
 
-                        editor.putString("user_name", body.username)
+                        userPreferences.saveUserName(body.username)
                         userPreferences.saveAccessToken(body.accessToken)
                         userPreferences.saveUserId(body.id.toString())
 

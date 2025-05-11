@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.example.tagarela.data.models.User
 import com.example.tagarela.data.repository.UserRepository
 import kotlinx.coroutines.launch
@@ -63,6 +64,15 @@ class AccountViewModel(
                 _errorMessage.value = e.message ?: "Erro desconhecido ao atualizar dados do usuário"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun logout(navHostController: NavHostController) {
+        viewModelScope.launch {
+            userPreferences.clearAll()
+            navHostController.navigate("signin") {
+                popUpTo("myaccount") { inclusive = true }
             }
         }
     }

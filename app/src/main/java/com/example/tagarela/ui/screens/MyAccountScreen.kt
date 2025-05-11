@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,12 +26,20 @@ import com.example.tagarela.R
 import com.example.tagarela.ui.components.Head
 import com.example.tagarela.ui.components.Menu
 import com.example.tagarela.data.UserPreferences
+import com.example.tagarela.ui.theme.Orange
+import com.example.tagarela.ui.viewmodel.AccountViewModel
+import com.example.tagarela.ui.viewmodel.AccountViewModelFactory
 
 @Composable
 fun MyAccountScreen(navHostController: NavHostController) {
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
+    val viewlModel: AccountViewModel = viewModel(factory = AccountViewModelFactory(context, userPreferences))
     val userName by userPreferences.userName.collectAsState(initial = null)
+    LaunchedEffect(userName) {
+        Log.d("MyAccountScreen", "🔍 Nome do usuário carregado: $userName")
+    }
+
 
     Scaffold(
         topBar = { Head() },
@@ -77,11 +88,27 @@ fun MyAccountScreen(navHostController: NavHostController) {
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(200.dp))
+                    Button(
+                        onClick = { viewlModel.logout(navHostController) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Orange,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .width(120.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        Text("SAIR", fontSize = 18.sp)
+                    }
                 }
             }
         },
     )
 }
+
 
 @Composable
 fun UserInfoItem(label: String, info: String) {

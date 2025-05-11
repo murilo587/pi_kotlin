@@ -56,9 +56,14 @@ class UserPreferences(context: Context) {
     }
 
     suspend fun saveUserName(userName: String) {
-        println("novo name:" + userName)
         dataStore.edit { preferences ->
             preferences[USER_NAME] = userName
+        }
+    }
+
+    suspend fun clearAll() {
+        dataStore.edit { prefs ->
+            prefs.clear()
         }
     }
 

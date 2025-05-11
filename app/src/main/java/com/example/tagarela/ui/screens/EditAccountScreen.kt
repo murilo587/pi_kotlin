@@ -70,7 +70,7 @@ fun EditAccountScreen(navHostController: NavHostController) {
                             TextField(
                                 value = username,
                                 onValueChange = { username = it; usernameError = it.isBlank() },
-                                label = { Text("Nome") },
+                                label = { Text("Novo Nome") },
                                 isError = usernameError,
                                 placeholder = { Text(userName ?: "Digite seu nome") },
                                 modifier = Modifier
@@ -81,7 +81,7 @@ fun EditAccountScreen(navHostController: NavHostController) {
                             TextField(
                                 value = password,
                                 onValueChange = { password = it; passwordError = it.isBlank() },
-                                label = { Text("Senha") },
+                                label = { Text("Nova Senha") },
                                 isError = passwordError,
                                 placeholder = { Text("**********") },
                                 modifier = Modifier
