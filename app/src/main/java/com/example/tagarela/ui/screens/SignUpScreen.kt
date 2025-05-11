@@ -38,7 +38,6 @@ fun SignUpScreen(navHostController: NavHostController) {
     val signUpViewModel: SignUpViewModel = viewModel(factory = SignUpViewModelFactory(context))
 
     var nickname by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
     val signUpResult by signUpViewModel.signUpResult
@@ -109,20 +108,6 @@ fun SignUpScreen(navHostController: NavHostController) {
                 Spacer(modifier = Modifier.height(26.dp))
 
                 TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("EMAIL", fontSize = 18.sp) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(horizontal = 13.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                )
-
-                Spacer(modifier = Modifier.height(26.dp))
-
-                TextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("SENHA", fontSize = 18.sp) },
@@ -150,15 +135,15 @@ fun SignUpScreen(navHostController: NavHostController) {
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(60.dp))
 
                 Button(
-                    onClick = { signUpViewModel.signUp(nickname, email, password, repeatPassword) },
+                    onClick = { signUpViewModel.signUp(nickname, password, repeatPassword) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 90.dp)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Orange),
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple40),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("CADASTRAR", fontSize = 20.sp, color = Color.White)
@@ -171,7 +156,7 @@ fun SignUpScreen(navHostController: NavHostController) {
                         Text("${signUpStateMessage.value}")
                         LaunchedEffect(userId) {
                             userId?.let {
-                                navHostController.navigate("search")
+                                navHostController.navigate("Home")
                             }
                         }
                     } else {

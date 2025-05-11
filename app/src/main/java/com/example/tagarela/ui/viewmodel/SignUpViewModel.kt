@@ -21,15 +21,17 @@ class SignUpViewModel(private val repository: UserRepository, private val userPr
     private val _state = MutableStateFlow<String?>(null)
     val state: StateFlow<String?> = _state
 
-    fun signUp(username: String, email: String, password: String, repeatPassword: String) {
+    fun signUp(username: String, password: String, repeatPassword: String) {
         viewModelScope.launch {
             try {
                 _loading.value = true
                 if (password != repeatPassword) {
                     _state.value = "Senhas não coincidem"
                 } else {
-                    val request = SignUpRequest(username, email, password)
+                    val request = SignUpRequest(username, password)
+                    println(request)
                     val result = repository.registerUser(request)
+                    println(result)
                     signUpResult.value = result
                     if (result.success) {
                         result.userId?.let { userPreferences.saveUserId(it) }

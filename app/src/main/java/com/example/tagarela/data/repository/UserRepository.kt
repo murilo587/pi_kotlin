@@ -41,8 +41,6 @@ class UserRepository(private val context: Context) {
                         userPreferences.saveAccessToken(body.accessToken)
                         userPreferences.saveUserId(body.id.toString())
 
-                        println("Access Token: ${body.accessToken}")
-                        println("User ID: ${body.id}")
 
                         return@withContext Result(
                             success = true,
@@ -64,20 +62,34 @@ class UserRepository(private val context: Context) {
 
     suspend fun registerUser(request: SignUpRequest): Result<Any?> {
         return withContext(Dispatchers.IO) {
-            val editor = sharedPreferences.edit()
+
             try {
                 val response = unauthenticatedApiService.signUp(request)
-                editor.putString("user_id", response.userId)
-                editor.apply()
 
-                userPreferences.saveUserId(response.userId)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        val editor = sharedPreferences.edit()
+                        editor.putString("access_token", body.accessToken)
+                        editor.putString("user_id", body.id)
+                        editor.apply()
 
-                Result(success = true, message = "Cadastro realizado com sucesso", userId = response.userId)
+                        userPreferences.saveAccessToken(body.accessToken)
+                        userPreferences.saveUserId(body.id)
+
+                        Result(success = true, message = "Cadastro realizado com sucesso", userId = body.id)
+                    } else {
+                        Result(success = false, error = "Resposta da API vazia")
+                    }
+                } else {
+                    Result(success = false, error = "Erro")
+                }
             } catch (e: Exception) {
                 Result(success = false, error = "Falha no cadastro")
             }
         }
     }
+
 
     suspend fun getUserData(userId: String): UserResult {
         return withContext(Dispatchers.IO) {

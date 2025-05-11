@@ -24,8 +24,8 @@ import retrofit2.http.Path
 interface ApiService {
     @POST("user/login")
     suspend fun signIn(@Body request: SignInRequest): Response<SignInResponse>
-    @POST("register")
-    suspend fun signUp(@Body request: SignUpRequest): SignUpResponse
+    @POST("user")
+    suspend fun signUp(@Body request: SignUpRequest): Response<SignUpResponse>
     @GET("item")
     suspend fun getAllItems(): List<Card>
     @GET("item/{id}")
