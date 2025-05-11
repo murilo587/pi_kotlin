@@ -1,12 +1,13 @@
 package com.example.tagarela.data.models
 
 data class UserResponse(
-    val message: String,
-    val user: User
+    val accessToken: String,
+    val tokenType: String,
+    val id: String,
+    val username: String
 )
 
 data class User(
-    val email: String,
     val username: String,
     val password: String
 )

@@ -3,21 +3,28 @@ package com.example.tagarela.ui.viewmodel
 import android.util.Log
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.tagarela.data.models.User
 import com.example.tagarela.data.repository.UserRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import com.example.tagarela.data.repository.Result // Importando a classe corrigida
+import com.example.tagarela.data.repository.Result
+import com.example.tagarela.data.UserPreferences
+import kotlinx.coroutines.flow.firstOrNull
 
-class AccountViewModel(context: Context) : ViewModel() {
+class AccountViewModel(
+    private val context: Context,
+    private val userPreferences: UserPreferences
+) : ViewModel() {
+
     private val userRepository = UserRepository(context)
 
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    private val _updateResult = MutableStateFlow<Result<Any?>?>(null) // Usando Result
+    private val _updateResult = MutableStateFlow<Result<Any?>?>(null)
     val updateResult: StateFlow<Result<Any?>?> = _updateResult
 
     private val _isLoading = MutableStateFlow(false)
@@ -26,41 +33,50 @@ class AccountViewModel(context: Context) : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    fun getUserData(userId: String) {
+
+    fun updateUser(username: String, password: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val userResult = userRepository.getUserData(userId)
-                _isLoading.value = false
-                if (userResult.success) {
-                    _user.value = userResult.user
+                val userId = userPreferences.userId.firstOrNull()
+
+                if (userId.isNullOrBlank()) {
+                    _errorMessage.value = "Erro: ID do usuário não encontrado"
+                    _isLoading.value = false
+                    return@launch
+                }
+
+                val result = userRepository.updateUser(userId, username, password)
+
+                if (result.success) {
+                    result.username?.let {
+                        Log.d("AccountViewModel", "Salvando novo username: $it")
+                        userPreferences.saveUserName(it)
+                    }
                     _errorMessage.value = null
                 } else {
-                    _errorMessage.value = userResult.error ?: "Erro ao obter dados do usuário"
+                    _errorMessage.value = result.error ?: "Erro ao atualizar dados do usuário"
                 }
+
+                _updateResult.value = result
             } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Erro desconhecido ao atualizar dados do usuário"
+            } finally {
                 _isLoading.value = false
-                _errorMessage.value = e.message ?: "Erro desconhecido ao obter dados do usuário"
             }
         }
     }
+}
 
-    fun updateUser(userId: String, username: String, email: String, password: String) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val result = userRepository.updateUser(userId, username, email, password)
-                _isLoading.value = false
-                _updateResult.value = result
-                if (!result.success) {
-                    _errorMessage.value = result.error ?: "Erro ao atualizar dados do usuário"
-                } else {
-                    _errorMessage.value = null
-                }
-            } catch (e: Exception) {
-                _isLoading.value = false
-                _errorMessage.value = e.message ?: "Erro desconhecido ao atualizar dados do usuário"
-            }
+class AccountViewModelFactory(
+    private val context: Context,
+    private val userPreferences: UserPreferences
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AccountViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AccountViewModel(context, userPreferences) as T
         }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -12,6 +12,7 @@ val Context.dataStore by preferencesDataStore("user_prefs")
 class UserPreferences(context: Context) {
 
     private val dataStore = context.dataStore
+    private val USER_NAME = stringPreferencesKey("user_name")
     private val USER_ID_KEY = stringPreferencesKey("user_id")
     private val USER_ACCESS_TOKEN = stringPreferencesKey("access_token")
     private val XSRF_TOKEN_KEY = stringPreferencesKey("xsrf_token")
@@ -31,24 +32,34 @@ class UserPreferences(context: Context) {
             preferences[XSRF_TOKEN_KEY]
         }
 
+    val userName: Flow<String?> = dataStore.data
+        .map { preferences ->
+            preferences[USER_NAME]
+        }
+
     suspend fun saveUserId(userId: String) {
-        println("id pra teste: ${userId}")
         dataStore.edit { preferences ->
             preferences[USER_ID_KEY] = userId
         }
     }
 
     suspend fun saveAccessToken(accessToken: String) {
-        println("token pra teste: ${accessToken}")
         dataStore.edit { preferences ->
             preferences[USER_ACCESS_TOKEN] = accessToken
         }
     }
 
     suspend fun saveXsrfToken(xsrfToken: String) {
-        println("SALVOU ESSA BOSTA: ${xsrfToken}")
         dataStore.edit { preferences ->
             preferences[XSRF_TOKEN_KEY] = xsrfToken
         }
     }
+
+    suspend fun saveUserName(userName: String) {
+        println("novo name:" + userName)
+        dataStore.edit { preferences ->
+            preferences[USER_NAME] = userName
+        }
+    }
+
 }

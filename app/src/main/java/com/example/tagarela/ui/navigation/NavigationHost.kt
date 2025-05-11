@@ -29,14 +29,9 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
         composable("game") { GameScreen(navController)}
         composable("home") { HomeScreen(navController)}
         composable("registercard") { RegisterCardScreen(navController)}
-        composable("myaccount/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")
-            userId?.let { MyAccountScreen(navController, it) }
-        }
-        composable("editaccount/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")
-            userId?.let { EditAccountScreen(navController, it) }
+        composable("editaccount") { EditAccountScreen(navController) }
+        composable("myaccount") { MyAccountScreen(navController) }
         }
     }
-}
+
 

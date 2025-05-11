@@ -32,6 +32,7 @@ class SignInViewModel(
                 val result = repository.login(username, password)
                 loginResult.value = result
                 if (result.success) {
+                    result.username?.let { userPreferences.saveUserName(it) }
                     result.userId?.let { userPreferences.saveUserId(it) }
                     result.accessToken?.let { userPreferences.saveAccessToken(it) }
                     _state.value = result.message

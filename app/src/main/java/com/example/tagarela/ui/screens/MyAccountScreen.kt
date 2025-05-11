@@ -1,6 +1,7 @@
 package com.example.tagarela.ui.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,36 +17,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tagarela.R
 import com.example.tagarela.ui.components.Head
 import com.example.tagarela.ui.components.Menu
-import com.example.tagarela.ui.viewmodel.AccountViewModel
-import android.util.Log
-
-class AccountViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AccountViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AccountViewModel(context) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+import com.example.tagarela.data.UserPreferences
 
 @Composable
-fun MyAccountScreen(navHostController: NavHostController, userId: String) {
+fun MyAccountScreen(navHostController: NavHostController) {
     val context = LocalContext.current
-    val viewModel: AccountViewModel = viewModel(factory = AccountViewModelFactory(context))
-    val user by viewModel.user.collectAsState()
-
-    LaunchedEffect(Unit) {
-        Log.d("MyAccountScreen", "Launching effect to get user data")
-        viewModel.getUserData(userId)
-    }
+    val userPreferences = remember { UserPreferences(context) }
+    val userName by userPreferences.userName.collectAsState(initial = null)
 
     Scaffold(
         topBar = { Head() },
@@ -72,13 +55,10 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
                             verticalAlignment = Alignment.Top
                         ) {
                             Column {
-                                if (user != null) {
-                                    Log.d("MyAccountScreen", "User data: ${user?.username}, ${user?.email}")
-                                    UserInfoItem(label = "Nome", info = user!!.username)
-                                    UserInfoItem(label = "E-mail", info = user!!.email)
+                                if (userName != null) {
+                                    UserInfoItem(label = "Nome", info = userName ?: "Nome não disponível")
                                     UserInfoItem(label = "Senha", info = "**********")
                                 } else {
-                                    Log.d("MyAccountScreen", "User data is null")
                                     Text(
                                         text = "Carregando...",
                                         style = TextStyle(color = Color.DarkGray, fontSize = 20.sp),
@@ -92,7 +72,7 @@ fun MyAccountScreen(navHostController: NavHostController, userId: String) {
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clickable {
-                                        navHostController.navigate("editaccount/$userId")
+                                        navHostController.navigate("editaccount")
                                     }
                             )
                         }

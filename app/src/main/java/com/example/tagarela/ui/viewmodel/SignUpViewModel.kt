@@ -34,6 +34,8 @@ class SignUpViewModel(private val repository: UserRepository, private val userPr
                     println(result)
                     signUpResult.value = result
                     if (result.success) {
+                        result.accessToken?.let { userPreferences.saveAccessToken(it) }
+                        result.username?.let { userPreferences.saveUserName(it) }
                         result.userId?.let { userPreferences.saveUserId(it) }
                         _state.value = result.message
                     }

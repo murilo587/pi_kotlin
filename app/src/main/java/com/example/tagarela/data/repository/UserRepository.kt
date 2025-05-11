@@ -2,6 +2,7 @@ package com.example.tagarela.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.tagarela.data.UserPreferences
 import com.example.tagarela.data.models.*
 import com.example.tagarela.data.api.RetrofitClient
@@ -10,7 +11,8 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class UserRepository(private val context: Context) {
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     private val unauthenticatedApiService = RetrofitClient.createUnauthenticatedApiService()
     private val authenticatedApiService = RetrofitClient.createApiService(context)
 
@@ -34,10 +36,12 @@ class UserRepository(private val context: Context) {
 
                     val body = response.body()
                     if (body != null) {
+                        editor.putString("user_name", body.username)
                         editor.putString("access_token", body.accessToken)
                         editor.putString("user_id", body.id.toString())
                         editor.apply()
 
+                        editor.putString("user_name", body.username)
                         userPreferences.saveAccessToken(body.accessToken)
                         userPreferences.saveUserId(body.id.toString())
 
@@ -49,10 +53,16 @@ class UserRepository(private val context: Context) {
                             accessToken = body.accessToken
                         )
                     } else {
-                        return@withContext Result(success = false, error = "Resposta vazia do servidor")
+                        return@withContext Result(
+                            success = false,
+                            error = "Resposta vazia do servidor"
+                        )
                     }
                 } else {
-                    return@withContext Result(success = false, error = "Falha no login: ${response.message()}")
+                    return@withContext Result(
+                        success = false,
+                        error = "Falha no login: ${response.message()}"
+                    )
                 }
             } catch (e: Exception) {
                 return@withContext Result(success = false, error = "Falha no login: ${e.message}")
@@ -70,14 +80,21 @@ class UserRepository(private val context: Context) {
                     val body = response.body()
                     if (body != null) {
                         val editor = sharedPreferences.edit()
+                        editor.putString("user_name", body.username)
                         editor.putString("access_token", body.accessToken)
                         editor.putString("user_id", body.id)
                         editor.apply()
 
+                        userPreferences.saveUserName(body.username)
                         userPreferences.saveAccessToken(body.accessToken)
+                        println("Token jwt salvo ${body.accessToken}")
                         userPreferences.saveUserId(body.id)
 
-                        Result(success = true, message = "Cadastro realizado com sucesso", userId = body.id)
+                        Result(
+                            success = true,
+                            message = "Cadastro realizado com sucesso",
+                            userId = body.id
+                        )
                     } else {
                         Result(success = false, error = "Resposta da API vazia")
                     }
@@ -90,40 +107,43 @@ class UserRepository(private val context: Context) {
         }
     }
 
-
-    suspend fun getUserData(userId: String): UserResult {
+    suspend fun updateUser(userId: String, username: String, password: String): Result<Any?> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = authenticatedApiService.getUser(userId).execute()
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        UserResult(success = true, user = it.user)
-                    } ?: UserResult(success = false, error = "Usuário não encontrado")
-                } else {
-                    UserResult(success = false, error = "Falha ao puxar dados do usuário")
-                }
-            } catch (e: Exception) {
-                UserResult(success = false, error = "Falha ao puxar dados do usuário")
-            }
-        }
-    }
+                val user = User(username = username, password = password)
+                val response: Response<UserResponse> =
+                    authenticatedApiService.updateUser(userId, user)
 
-    suspend fun updateUser(userId: String, username: String, email: String, password: String): Result<Any?> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val user = User(email = email, username = username, password = password)
-                val response: Response<UserResponse> = authenticatedApiService.updateUser(userId, user)
                 if (response.isSuccessful) {
-                    Result(success = true, message = "Usuário atualizado com sucesso")
+                    val body = response.body()
+                    if (body != null) {
+                        userPreferences.saveAccessToken(body.accessToken)
+                        return@withContext Result(
+                            success = true,
+                            message = "Usuário atualizado com sucesso",
+                            username = body.username
+                        )
+                    } else {
+                        return@withContext Result(
+                            success = false,
+                            error = "Erro: Corpo da resposta está vazio"
+                        )
+                    }
                 } else {
-                    Result(success = false, error = "Falha ao atualizar dados do usuário")
+                    return@withContext Result(
+                        success = false,
+                        error = "Erro ao atualizar usuário: ${response.message()}"
+                    )
                 }
             } catch (e: Exception) {
-                Result(success = false, error = "Falha ao atualizar dados do usuário")
+                return@withContext Result(
+                    success = false,
+                    error = "Falha ao atualizar dados do usuário: ${e.message}"
+                )
             }
         }
     }
 }
 
-data class Result<T>(val success: Boolean, val message: String? = null, val userId: String? = null, val error: String? = null, val accessToken: String? = null)
+data class Result<T>(val success: Boolean, val message: String? = null, val userId: String? = null, val error: String? = null, val accessToken: String? = null, val username: String? = null)
 data class UserResult(val success: Boolean, val user: User? = null, val error: String? = null)

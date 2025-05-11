@@ -52,7 +52,7 @@ fun SettingsScreen(navHostController: NavHostController) {
                                 .padding(vertical = 20.dp)
                                 .clickable {
                                     userId?.let {
-                                        navHostController.navigate("myaccount/$it")
+                                        navHostController.navigate("myaccount")
                                     } ?: run {
                                     }
                                 },

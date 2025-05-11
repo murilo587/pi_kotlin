@@ -1,7 +1,6 @@
 package com.example.tagarela.ui.screens
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,41 +20,31 @@ import androidx.navigation.NavHostController
 import com.example.tagarela.ui.components.Head
 import com.example.tagarela.ui.components.Menu
 import com.example.tagarela.ui.viewmodel.AccountViewModel
+import com.example.tagarela.data.UserPreferences
+import com.example.tagarela.ui.viewmodel.AccountViewModelFactory
 
 @Composable
-fun EditAccountScreen(navHostController: NavHostController, userId: String) {
+fun EditAccountScreen(navHostController: NavHostController) {
     val context = LocalContext.current
-    val viewModel: AccountViewModel = viewModel(factory = AccountViewModelFactory(context))
-    val user by viewModel.user.collectAsState()
+    val userPreferences = remember { UserPreferences(context) }
+    val viewModel: AccountViewModel = viewModel(factory = AccountViewModelFactory(context, userPreferences))
     val updateResult by viewModel.updateResult.collectAsState()
+    val userName by userPreferences.userName.collectAsState(initial = null)
+    val userId by userPreferences.userId.collectAsState(initial = null)
 
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf(userName ?: "") }
     var password by remember { mutableStateOf("") }
     var usernameError by remember { mutableStateOf(false) }
-    var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        viewModel.getUserData(userId)
-    }
-
-    LaunchedEffect(user) {
-        user?.let {
-            username = it.username
-            email = it.email
-            password = ""
-        }
-    }
-
     LaunchedEffect(updateResult) {
-        Log.d("EditAccountScreen", "updateResult: $updateResult")
+        Log.d("EditAccountScreen", "🔍 updateResult recebido: $updateResult")
+
         updateResult?.let {
             if (it.success) {
                 navHostController.popBackStack()
             } else {
-                Log.e("EditAccountScreen", "Erro ao atualizar usuário: ${it.error}")
                 errorMessage = it.error ?: "Erro ao atualizar usuário"
             }
         }
@@ -83,21 +72,10 @@ fun EditAccountScreen(navHostController: NavHostController, userId: String) {
                                 onValueChange = { username = it; usernameError = it.isBlank() },
                                 label = { Text("Nome") },
                                 isError = usernameError,
-                                placeholder = { Text(user?.username ?: "") },
+                                placeholder = { Text(userName ?: "Digite seu nome") },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .border(1.dp, if (usernameError) Color.Red else Color.Transparent)
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            TextField(
-                                value = email,
-                                onValueChange = { email = it; emailError = it.isBlank() },
-                                label = { Text("E-mail") },
-                                isError = emailError,
-                                placeholder = { Text(user?.email ?: "") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(1.dp, if (emailError) Color.Red else Color.Transparent)
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                             TextField(
@@ -115,12 +93,16 @@ fun EditAccountScreen(navHostController: NavHostController, userId: String) {
                             Button(
                                 onClick = {
                                     usernameError = username.isBlank()
-                                    emailError = email.isBlank()
                                     passwordError = password.isBlank()
 
-                                    if (!usernameError && !emailError && !passwordError) {
-                                        Log.d("EditAccountScreen", "Botão Confirmar clicado")
-                                        viewModel.updateUser(userId, username, email, password)
+                                    if (!usernameError && !passwordError) {
+                                        if (!userId.isNullOrBlank()) {
+                                            Log.d("EditAccountScreen", "Botão Confirmar clicado")
+                                            viewModel.updateUser(username, password)
+                                        } else {
+                                            errorMessage = "Erro: ID do usuário não encontrado"
+                                            Log.e("EditAccountScreen", "Erro: ID do usuário não encontrado")
+                                        }
                                     } else {
                                         errorMessage = "Todos os campos devem ser preenchidos"
                                         Log.e("EditAccountScreen", "Todos os campos devem ser preenchidos")

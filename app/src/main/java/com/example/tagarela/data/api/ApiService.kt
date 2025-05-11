@@ -50,6 +50,6 @@ interface ApiService {
     fun getUser(@Path("id") userId: String): Call<UserResponse>
     @GET("quiz/random")
     suspend fun fetchAllQuizzes(): GameResponse
-    @PUT("user/{id}")
-    suspend fun updateUser(@Path("id") id: String, @Body user: User): Response<UserResponse>
+    @PUT("user/{userId}")
+    suspend fun updateUser(@Path("userId") userId: String, @Body user: User): Response<UserResponse>
 }
