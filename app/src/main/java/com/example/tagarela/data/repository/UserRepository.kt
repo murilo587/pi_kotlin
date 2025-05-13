@@ -36,6 +36,7 @@ class UserRepository(private val context: Context) {
 
                     val body = response.body()
                     if (body != null) {
+                        userPreferences.setLoggedStatus(true)
                         editor.putString("user_name", body.username)
                         editor.putString("access_token", body.accessToken)
                         editor.putString("user_id", body.id.toString())
@@ -80,6 +81,7 @@ class UserRepository(private val context: Context) {
                     val body = response.body()
                     if (body != null) {
                         val editor = sharedPreferences.edit()
+                        userPreferences.setLoggedStatus(true)
                         editor.putString("user_name", body.username)
                         editor.putString("access_token", body.accessToken)
                         editor.putString("user_id", body.id)

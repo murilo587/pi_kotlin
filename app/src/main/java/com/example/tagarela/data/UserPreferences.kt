@@ -1,6 +1,7 @@
 package com.example.tagarela.data
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -16,6 +17,12 @@ class UserPreferences(context: Context) {
     private val USER_ID_KEY = stringPreferencesKey("user_id")
     private val USER_ACCESS_TOKEN = stringPreferencesKey("access_token")
     private val XSRF_TOKEN_KEY = stringPreferencesKey("xsrf_token")
+    private val IS_LOGGED_KEY = booleanPreferencesKey("is_logged")
+
+    val isLogged: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[IS_LOGGED_KEY] ?: false
+        }
 
     val userId: Flow<String?> = dataStore.data
         .map { preferences ->
@@ -36,6 +43,12 @@ class UserPreferences(context: Context) {
         .map { preferences ->
             preferences[USER_NAME]
         }
+
+    suspend fun setLoggedStatus(isLogged: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[IS_LOGGED_KEY] = isLogged
+        }
+    }
 
     suspend fun saveUserId(userId: String) {
         dataStore.edit { preferences ->

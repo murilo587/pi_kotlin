@@ -139,7 +139,7 @@ fun SignInScreen(navHostController: NavHostController) {
                         Text( "${signInStateMessage.value}")
                         LaunchedEffect(userId) {
                             if (userId != null) {
-                                navHostController.navigate("settings")
+                                navHostController.navigate("home")
                             }
                         }
                         if (userId == null) {

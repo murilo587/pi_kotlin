@@ -70,6 +70,7 @@ class AccountViewModel(
 
     fun logout(navHostController: NavHostController) {
         viewModelScope.launch {
+            userPreferences.setLoggedStatus(false)
             userPreferences.clearAll()
             navHostController.navigate("signin") {
                 popUpTo("myaccount") { inclusive = true }
