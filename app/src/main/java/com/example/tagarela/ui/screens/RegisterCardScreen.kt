@@ -2,7 +2,6 @@ package com.example.tagarela.ui.screens
 
 import android.content.Context
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,7 +20,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -34,6 +32,8 @@ import com.example.tagarela.ui.components.Menu
 import com.example.tagarela.ui.viewmodel.CardViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tagarela.data.UserPreferences
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -52,27 +52,26 @@ fun RegisterCardScreen(navController: NavHostController) {
 
     var videoSelected by remember { mutableStateOf(false) }
     var audioSelected by remember { mutableStateOf(false) }
+    var showSuccessMessage by remember { mutableStateOf(false) }
+    var category by remember { mutableStateOf("meus cartoes") }
+    val isLoading by viewModel.loading.collectAsState(initial = false)
 
-    val pickImageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> imageUri = uri }
-    )
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
-    val pickVideoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            videoUri = uri
-            videoSelected = true
+    LaunchedEffect(showSuccessMessage) {
+        if (showSuccessMessage) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Card cadastrado com sucesso!",
+                    duration = SnackbarDuration.Short
+                )
+                delay(1000)
+                showSuccessMessage = false
+                navController.navigate("home")
+            }
         }
-    )
-
-    val pickAudioLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            audioUri = uri
-            audioSelected = true
-        }
-    )
+    }
 
     fun copyFileToAppDirectory(context: Context, uri: Uri, prefix: String, extension: String): File? {
         return try {
@@ -92,7 +91,38 @@ fun RegisterCardScreen(navController: NavHostController) {
         }
     }
 
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            imageUri = uri
+            if (uri != null) {
+                val imageFile = copyFileToAppDirectory(context, uri, "image", "jpg")
+                if (imageFile != null) {
+                    viewModel.uploadImageAndGetCategory(imageFile)
+                }
+            }
+        }
+    )
+
+    val pickVideoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            videoUri = uri
+            videoSelected = true
+        }
+    )
+
+    val pickAudioLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            audioUri = uri
+            audioSelected = true
+        }
+    )
+
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { Head() },
         bottomBar = { Menu(navController) },
         containerColor = Color.White
@@ -104,15 +134,7 @@ fun RegisterCardScreen(navController: NavHostController) {
                 .padding(16.dp)
         ) {
             item {
-                Text(
-                    text = "ADICIONAR CARTÃO",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 12.dp),
-                    textAlign = TextAlign.Start
-                )
+                SectionTitle("ADICIONAR CARTÃO")
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 5.dp, horizontal = 12.dp),
                     thickness = 2.dp,
@@ -155,7 +177,7 @@ fun RegisterCardScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(40.dp))
                 Button(
                     onClick = {
-                        if (name.isNotBlank() && syllables.isNotBlank() && imageUri != null && videoUri != null && audioUri != null) {
+                        if (!isLoading && name.isNotBlank() && syllables.isNotBlank() && imageUri != null && videoUri != null && audioUri != null) {
                             val imageFile = copyFileToAppDirectory(context, imageUri!!, "image", "jpg")
                             val videoFile = copyFileToAppDirectory(context, videoUri!!, "video", "mp4")
                             val audioFile = copyFileToAppDirectory(context, audioUri!!, "audio", "mp3")
@@ -167,30 +189,41 @@ fun RegisterCardScreen(navController: NavHostController) {
                                     image = imageFile,
                                     video = videoFile,
                                     audio = audioFile,
-                                    category = "meus cartoes",
-                                    subcategory = "default",
+                                    category = category,
+                                    subcategory = "default"
                                 )
-                                println(newCard)
+
                                 viewModel.addNewCard(newCard, userId)
-                                Toast.makeText(context, "Cartão Salvo!", Toast.LENGTH_SHORT).show()
+
+                                coroutineScope.launch {
+                                    showSuccessMessage = true
+                                }
+
                             } else {
-                                Toast.makeText(context, "Erro ao salvar arquivos!", Toast.LENGTH_SHORT).show()
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Erro ao salvar arquivos!")
+                                }
                             }
                         } else {
-                            Toast.makeText(context, "Por favor, preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Por favor, preencha todos os campos!")
+                            }
                         }
                     },
+                    enabled = !isLoading,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E57C2)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
+                    modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text(
-                        text = "SALVAR CARTÃO",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text(
+                            text = "SALVAR CARTÃO",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
@@ -198,7 +231,6 @@ fun RegisterCardScreen(navController: NavHostController) {
         }
     }
 }
-
 
 @Composable
 fun SectionTitle(title: String) {

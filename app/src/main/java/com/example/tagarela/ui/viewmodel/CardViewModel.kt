@@ -42,6 +42,9 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private val _category = MutableStateFlow("meus cartoes")
+    val category: StateFlow<String> = _category
+
     private val _addCardResponse = MutableStateFlow<Response<NewCard>?>(null)
     val addCardResponse: StateFlow<Response<NewCard>?> = _addCardResponse
 
@@ -123,6 +126,28 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
             _loading.value = false
         }
     }
+
+    fun uploadImageAndGetCategory(imageFile: File) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val imagePart = MultipartBody.Part.createFormData("file", imageFile.name, requestFile)
+
+                val response = repository.uploadImage(imagePart)
+
+                if (response.isSuccessful) {
+                    _category.value = response.body()?.category ?: "default"
+                } else {
+                    _category.value = "default"
+                }
+            } catch (e: Exception) {
+                _category.value = "default"
+            }
+            _loading.value = false
+        }
+    }
+
 
     fun addNewCard(newCard: NewCard, userId: String) {
         _loading.value = true

@@ -1,6 +1,7 @@
 package com.example.tagarela.data.api
 
 import GameResponse
+import ImageCategoryResponse
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.data.models.NewCard
 import com.example.tagarela.data.models.SignInRequest
@@ -31,6 +32,11 @@ interface ApiService {
     suspend fun getAllItems(): List<Card>
     @GET("item/{id}")
     suspend fun getCardById(@Path("id") cardId: String): Card
+    @Multipart
+    @POST("item/foto")
+    suspend fun uploadImage(
+        @Part file: MultipartBody.Part
+    ): Response<ImageCategoryResponse>
     @Multipart
         @POST("item/user/{userId}")
         suspend fun addNewCard(

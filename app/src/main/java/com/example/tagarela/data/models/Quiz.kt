@@ -23,3 +23,7 @@ data class Item(
     val subcategory: String,
     val userId: String?
 )
+
+data class ImageCategoryResponse(
+    val category: String
+)

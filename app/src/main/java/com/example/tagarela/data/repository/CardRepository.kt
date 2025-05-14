@@ -1,7 +1,7 @@
 package com.example.tagarela.data.repository
 
+import ImageCategoryResponse
 import android.content.Context
-import android.util.Log
 import com.example.tagarela.data.api.RetrofitClient
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.data.models.NewCard
@@ -37,6 +37,14 @@ class CardRepository(private val context: Context) {
             return response.body() ?: emptyList()
         } else {
             throw Exception("Erro ao buscar cartões")
+        }
+    }
+
+    suspend fun uploadImage(imagePart: MultipartBody.Part): Response<ImageCategoryResponse> {
+        return try {
+            apiService.uploadImage(imagePart)
+        } catch (e: Exception) {
+            Response.success(null)
         }
     }
 
