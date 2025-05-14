@@ -8,6 +8,7 @@ import com.example.tagarela.data.models.SignInResponse
 import com.example.tagarela.data.models.SignUpRequest
 import com.example.tagarela.data.models.SignUpResponse
 import com.example.tagarela.data.models.User
+import com.example.tagarela.data.models.UserCard
 import com.example.tagarela.data.models.UserResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -52,4 +53,7 @@ interface ApiService {
     suspend fun fetchAllQuizzes(): GameResponse
     @PUT("user/{userId}")
     suspend fun updateUser(@Path("userId") userId: String, @Body user: User): Response<UserResponse>
+    @GET("item/user/{userId}")
+    suspend fun getUserCards(@Path("userId") userId: String): Response<List<UserCard>>
+
 }

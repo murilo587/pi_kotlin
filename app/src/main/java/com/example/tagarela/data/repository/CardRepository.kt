@@ -1,9 +1,11 @@
 package com.example.tagarela.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.tagarela.data.api.RetrofitClient
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.data.models.NewCard
+import com.example.tagarela.data.models.UserCard
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -28,6 +30,16 @@ class CardRepository(private val context: Context) {
         return apiService.getMostUsedCards()
     }
 
+    suspend fun getUserCards(userId: String): List<UserCard> {
+        val response = apiService.getUserCards(userId)
+
+        if (response.isSuccessful) {
+            return response.body() ?: emptyList()
+        } else {
+            throw Exception("Erro ao buscar cartões")
+        }
+    }
+
     suspend fun addNewCard(
         userId: String,
         name: RequestBody,
@@ -49,4 +61,5 @@ class CardRepository(private val context: Context) {
             audio
         )
     }
+
     }

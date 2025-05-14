@@ -22,3 +22,15 @@ data class NewCard(
     val syllables: String,
     val video: File,
 )
+
+data class UserCard(
+    val audio: String,
+    val category: String,
+    val id: String,
+    val image: String,
+    val name: String,
+    val subcategory: String,
+    val syllables: String,
+    val video: String,
+    val userId: String
+)

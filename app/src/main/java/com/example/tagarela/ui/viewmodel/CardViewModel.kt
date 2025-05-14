@@ -1,10 +1,12 @@
 package com.example.tagarela.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.tagarela.data.models.Card
 import com.example.tagarela.data.models.NewCard
+import com.example.tagarela.data.models.UserCard
 import com.example.tagarela.data.repository.CardRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +23,9 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
 
     private val _cards = MutableStateFlow<List<Card>>(emptyList())
     val cards: StateFlow<List<Card>> = _cards
+
+    private val _userCards = MutableStateFlow<List<UserCard>>(emptyList())
+    val userCards: StateFlow<List<UserCard>> = _userCards
 
     private val _recentCards = MutableStateFlow<List<Card>>(emptyList())
     val recentCards: StateFlow<List<Card>> = _recentCards
@@ -41,8 +46,10 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
     val addCardResponse: StateFlow<Response<NewCard>?> = _addCardResponse
 
     init {
+        Log.d("CardViewModel", "ViewModel foi inicializado.")
         fetchAllCards()
         fetchRecentCards()
+        fetchMostUsedCards()
     }
 
     fun fetchAllCards() {
@@ -81,11 +88,27 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
                 _mostUsedCards.value = mostUsedCardsResponse
                 _error.value = null
             } catch (e: Exception) {
-                _error.value = e.message ?: "Erro ao carregar os cartões recentes"
+                _error.value = e.message ?: "Erro ao carregar os cartões mais usados"
             }
             _loading.value = false
         }
     }
+
+    fun fetchUserCards(userId: String) {
+        _loading.value = true
+        viewModelScope.launch {
+            try {
+                val userCardsResponse = repository.getUserCards(userId)
+                _userCards.value = userCardsResponse
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Erro ao carregar os cartões do usuário"
+                Log.e("CardViewModel", "Erro ao buscar cartões: ${e.message}")
+            }
+            _loading.value = false
+        }
+    }
+
 
     fun fetchCardDetails(cardId: String) {
         _loading.value = true
@@ -95,7 +118,7 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
                 _selectedCard.value = cardDetails
                 _error.value = null
             } catch (e: Exception) {
-                _error.value = e.message ?: "Erro ao buscar detalhes do card"
+                _error.value = e.message ?: "Erro ao buscar detalhes do cartão"
             }
             _loading.value = false
         }
@@ -118,8 +141,7 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
                     userId, name, syllables, category, subcategory,
                     imagePart, videoPart, audioPart
                 )
-
-                println("response: ${response}")
+                println("VM: ${response}")
                 _addCardResponse.value = response
                 _error.value = if (response.isSuccessful) null else "Erro ao adicionar o novo cartão"
             } catch (e: Exception) {
@@ -128,7 +150,6 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
             _loading.value = false
         }
     }
-
 
     private fun createPartFromString(value: String): RequestBody {
         return value.toRequestBody("text/plain".toMediaTypeOrNull())
