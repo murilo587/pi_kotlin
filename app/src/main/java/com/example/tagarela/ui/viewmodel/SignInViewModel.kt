@@ -28,6 +28,8 @@ class SignInViewModel(
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _loading.value = true
+            loginResult.value = null
+            _state.value = null
             try {
                 val result = repository.login(username, password)
                 loginResult.value = result

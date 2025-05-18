@@ -62,11 +62,11 @@ class UserRepository(private val context: Context) {
                 } else {
                     return@withContext Result(
                         success = false,
-                        error = "Falha no login: ${response.message()}"
+                        error = "Falha no login"
                     )
                 }
             } catch (e: Exception) {
-                return@withContext Result(success = false, error = "Falha no login: ${e.message}")
+                return@withContext Result(success = false, error = "Falha no login")
             }
         }
     }
