@@ -18,7 +18,6 @@ import com.example.tagarela.ui.screens.SignUpScreen
 import com.example.tagarela.ui.screens.MyAccountScreen
 import com.example.tagarela.ui.screens.EditAccountScreen
 import com.example.tagarela.ui.screens.QueueScreen
-import com.example.tagarela.ui.screens.GameMenuScreen
 import com.example.tagarela.ui.screens.GameScreen
 import com.example.tagarela.ui.screens.SearchScreen
 import com.example.tagarela.ui.screens.HomeScreen
@@ -57,7 +56,6 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
             composable("settings") { SettingsScreen(navController) }
             composable("signup") { SignUpScreen(navController) }
             composable("queue") { QueueScreen(navController) }
-            composable("gamemenu") { GameMenuScreen(navController) }
             composable("game") { GameScreen(navController) }
             composable("home") { HomeScreen(navController) }
             composable("registercard") { RegisterCardScreen(navController) }

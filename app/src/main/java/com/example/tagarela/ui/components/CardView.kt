@@ -28,7 +28,7 @@ fun CardView(card: Card, isLarge: Boolean = false, onClick: () -> Unit) {
 
     Card(
         modifier = Modifier
-            .width(if (isLarge) 155.dp else 115.dp)
+            .width(if (isLarge) 150.dp else 115.dp)
             .height(if (isLarge) 170.dp else 136.dp)
             .padding(bottom = 16.dp)
             .clickable { onClick() }

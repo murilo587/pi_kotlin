@@ -27,7 +27,6 @@ android {
 
         buildConfigField("String", "BASE_IMG_URL", "\"$baseImgUrl\"")
 
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -62,11 +61,17 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.test.espresso:espresso-core:3.5.1")
+        }
+    }
 }
 
 dependencies {
-    implementation (libs.okhttp)
-    implementation (libs.exoplayer)
+    implementation(libs.okhttp)
+    implementation(libs.exoplayer)
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
@@ -77,9 +82,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.ui.test.android)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
@@ -87,6 +89,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation (libs.accompanist.flowlayout)
+    implementation(libs.accompanist.flowlayout)
     implementation(libs.androidx.datastore.preferences)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
 }

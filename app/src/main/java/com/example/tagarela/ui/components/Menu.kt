@@ -58,7 +58,7 @@ fun Menu(navHostController: NavHostController) {
                 )
             }
             Button(
-                onClick = {navHostController.navigate("gamemenu")},
+                onClick = {navHostController.navigate("game")},
                 modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Transparent

@@ -197,7 +197,6 @@ fun GameScreen(navController: NavHostController) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             listOf(0 to 2, 2 to 4).forEach { (start, end) ->
-                                Spacer(modifier = Modifier.height(7.dp))
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceEvenly
